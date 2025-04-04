@@ -28,6 +28,22 @@ bot.event('message', async event => {
   }
 });
 
+export async function battery_msg(battery) {
+  try {
+    await bot.client.chat.postEphemeral({
+      channel: CHANNEL,
+      text: `Battery percentage is ${battery}%`,
+      user: 'U07V1ND4H0Q'
+    });
+  } catch (error) {
+    await bot.client.chat.postMessage({
+      channel: CHANNEL,
+      text: messages.error,
+    });
+    console.error(error);
+  }
+}
+
 (async () => {
   await bot.start();
   console.log('Application started');

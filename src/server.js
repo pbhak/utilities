@@ -1,11 +1,12 @@
-import express from 'express';
+import { battery_msg } from './bot.js';
 import bodyParser from 'body-parser';
+import express from 'express';
 
 const server = express();
 server.use(bodyParser.json());
 
 server.listen(process.env.PORT, () => {
-  console.log(`Server started on port ${process.env.PORT}`);
+  console.log(`server: started on port ${process.env.PORT}`);
 });
 
 server.post('/battery', (req, res) => {
@@ -13,6 +14,7 @@ server.post('/battery', (req, res) => {
     res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
     return;
   }
+  battery_msg(req.body.battery);
   console.log(req.body.battery); // TODO: Replace this with a function call in bot.js to send to channel
   res.sendStatus(200);
 });
