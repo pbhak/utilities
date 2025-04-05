@@ -41,17 +41,17 @@ async function location_info(lat, lon) {
   return result.address;
 }
 
-const battery_emoji = battery => battery <= 20 ? ':low_battery:' : ':battery:'
+const battery_emoji = (battery, charging) => charging ? ':zap' : (battery <= 20 ? ':low_battery:' : ':battery:')
 const location_emoji = country => (country == 'United States') ? ':us:' : ':globe_with_meridians:'
 
-async function info(battery, lat, lon) {
+async function info(battery, charging, lat, lon) {
   const location = await location_info(lat, lon);
 
   try {
     await bot.client.chat.postMessage({
       channel: CHANNEL,
       text: messages.stats
-              .replace('{battery}', `${battery}% ${battery_emoji(battery)}`)
+              .replace('{battery}', `${battery}% ${battery_emoji(battery, charging)}`)
               .replace('{location}', `${location.city}, ${location.state}  ${location_emoji(location.country)}`)
     });
   } catch (error) {
@@ -78,12 +78,13 @@ server.post('/info', (req, res) => {
     req.body.battery < 0 || 
     req.body.battery > 100 || 
     req.body.lat == undefined || 
-    req.body.lon == undefined
+    req.body.lon == undefined  ||
+    req.body.charging == undefined
   ) {
     res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
     return;
   }
-  info(req.body.battery, req.body.lat, req.body.lon);
+  info(req.body.battery, req.body.charging, req.body.lat, req.body.lon);
   res.sendStatus(200);
 });
 
