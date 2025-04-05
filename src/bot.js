@@ -1,6 +1,8 @@
 import Bolt from '@slack/bolt';
 import { readFileSync } from 'node:fs';
 import yaml from 'js-yaml';
+import bodyParser from 'body-parser';
+import express from 'express';
 
 const bot = new Bolt.App({
   token: process.env.ACCESS_TOKEN,
@@ -22,17 +24,17 @@ bot.event('message', async event => {
   } catch (error) {
     await bot.client.chat.postMessage({
       channel: CHANNEL,
-      text: messages.error,
+      text: messages.error
     });
     console.error(error);
   }
 });
 
-export async function battery_msg(battery) {
+async function battery_msg(battery) {
   try {
     await bot.client.chat.postMessage({
       channel: CHANNEL,
-      text: `Battery percentage is ${battery}%`
+      text: `current battery percentage is ${battery}%`
     });
   } catch (error) {
     await bot.client.chat.postMessage({
@@ -43,7 +45,31 @@ export async function battery_msg(battery) {
   }
 }
 
+// Express server
+const server = express();
+server.use(bodyParser.json());
+
+server.get('/', (req, res) => {
+  res.send("hi! you've reached the root endpoint on my info api. maybe check your request uri? - pbhak :)");
+  console.log('GET request received to /')
+});
+
+server.post('/info', (req, res) => {
+  if (req.body.battery == undefined || req.body.battery < 0 || req.body.battery > 100) {
+    res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
+    return;
+  }
+  battery_msg(req.body.battery);
+  res.sendStatus(200);
+});
+
+// Start bot and server
+
 (async () => {
   await bot.start();
   console.log('application started!');
 })();
+
+server.listen(process.env.PORT, () => {
+  console.log(`server: started on port ${process.env.PORT}`);
+});
