@@ -3,6 +3,12 @@ import { readFileSync } from 'node:fs';
 import yaml from 'js-yaml';
 import bodyParser from 'body-parser';
 import express from 'express';
+import nominatim from 'nominatim-client';
+
+const geocoding = nominatim.createClient({
+  useragent: "pbhak's utilities",            
+  referer: 'https://info.pbhak.hackclub.app',  
+});
 
 const bot = new Bolt.App({
   token: process.env.ACCESS_TOKEN,
@@ -30,11 +36,21 @@ bot.event('message', async event => {
   }
 });
 
-async function battery_msg(battery) {
+async function location_info(lat, lon) {
+  const result = await geocoding.reverse({ lat, lon });
+  return result.address;
+}
+
+async function info(battery, lat, lon) {
+  const location = await location_info(lat, lon);
+
   try {
-    await bot.client.chat.postMessage({
+    await bot.client.chat.postEphemeral({
       channel: CHANNEL,
-      text: `current battery percentage is ${battery}%`
+      text: messages.stats
+              .replace('{battery}', `${battery}%`)
+              .replace('{location}', `${location.city}, ${location.state}`),
+      user: 'U07V1ND4H0Q'
     });
   } catch (error) {
     await bot.client.chat.postMessage({
@@ -55,16 +71,21 @@ server.get('/', (req, res) => {
 });
 
 server.post('/info', (req, res) => {
-  if (req.body.battery == undefined || req.body.battery < 0 || req.body.battery > 100) {
+  if (
+    req.body.battery == undefined || 
+    req.body.battery < 0 || 
+    req.body.battery > 100 || 
+    req.body.lat == undefined || 
+    req.body.lon == undefined
+  ) {
     res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
     return;
   }
-  battery_msg(req.body.battery);
+  info(req.body.battery, req.body.lat, req.body.lon);
   res.sendStatus(200);
 });
 
 // Start bot and server
-
 (async () => {
   await bot.start();
   console.log('application started!');

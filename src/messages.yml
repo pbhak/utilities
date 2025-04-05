@@ -6,3 +6,9 @@ welcome: |
   have a good one!
 
 error: An error has occurred - see console for more information
+
+stats: |
+  *daily stats:*
+  phone battery: {battery}
+  location: {location}
+#  weather: {weather} 
