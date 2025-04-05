@@ -18,7 +18,7 @@ const bot = new Bolt.App({
 
 const CHANNEL = 'C08H2P5RHA7'; // C01KPAX6AG2 for #bot-testing-ground, C08H2P5RHA7 for #parneel-yaps
 
-const messages = yaml.load(readFileSync('src/messages.yml'));
+const messages = yaml.load(readFileSync(process.env.YAML_FILE));
 
 bot.event('member_joined_channel', async event => {
   try {
