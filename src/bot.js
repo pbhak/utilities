@@ -41,7 +41,7 @@ async function location_info(lat, lon) {
   return result.address;
 }
 
-const battery_emoji = (battery, charging) => charging ? ':zap:' : (battery <= 20 ? messages.emoji.battery.low : messages.emoji.battery.normal)
+const battery_emoji = (battery, charging) => charging ? ':zap:' : (battery <= 20 ? messages.emojis.battery.low : messages.emojis.battery.normal)
 const location_emoji = country => (country == 'United States') ? messages.emojis.country.us : messages.emojis.country.other
 
 async function info(battery, charging, lat, lon) {
