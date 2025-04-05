@@ -41,6 +41,9 @@ async function location_info(lat, lon) {
   return result.address;
 }
 
+const battery_emoji = battery => battery <= 20 ? ':low_battery:' : ':battery:'
+const location_emoji = country => (country == 'United States') ? ':us:' : ':globe_with_meridians:'
+
 async function info(battery, lat, lon) {
   const location = await location_info(lat, lon);
 
@@ -48,8 +51,8 @@ async function info(battery, lat, lon) {
     await bot.client.chat.postMessage({
       channel: CHANNEL,
       text: messages.stats
-              .replace('{battery}', `${battery}%`)
-              .replace('{location}', `${location.city}, ${location.state}`)
+              .replace('{battery}', `${battery}% ${battery_emoji(battery)}`)
+              .replace('{location}', `${location.city}, ${location.state} ${location_emoji(location.country)}`)
     });
   } catch (error) {
     await bot.client.chat.postMessage({
