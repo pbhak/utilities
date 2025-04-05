@@ -52,7 +52,7 @@ async function info(battery, lat, lon) {
       channel: CHANNEL,
       text: messages.stats
               .replace('{battery}', `${battery}% ${battery_emoji(battery)}`)
-              .replace('{location}', `${location.city}, ${location.state} ${location_emoji(location.country)}`)
+              .replace('{location}', `${location.city}, ${location.state}  ${location_emoji(location.country)}`)
     });
   } catch (error) {
     await bot.client.chat.postMessage({
