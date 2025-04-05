@@ -41,7 +41,7 @@ async function location_info(lat, lon) {
   return result.address;
 }
 
-const battery_emoji = (battery, charging) => charging ? ':zap' : (battery <= 20 ? ':low_battery:' : ':battery:')
+const battery_emoji = (battery, charging) => charging ? ':zap:' : (battery <= 20 ? ':low_battery:' : ':battery:')
 const location_emoji = country => (country == 'United States') ? ':us:' : ':globe_with_meridians:'
 
 async function info(battery, charging, lat, lon) {
@@ -84,6 +84,7 @@ server.post('/info', (req, res) => {
     res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
     return;
   }
+  req.body.charging = req.body.charging == 'Yes' ? true : false
   info(req.body.battery, req.body.charging, req.body.lat, req.body.lon);
   res.sendStatus(200);
 });
