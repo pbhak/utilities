@@ -18,7 +18,7 @@ const bot = new Bolt.App({
 
 const CHANNEL = 'C08H2P5RHA7'; // C01KPAX6AG2 for #bot-testing-ground, C08H2P5RHA7 for #parneel-yaps
 
-const messages = yaml.load(readFileSync('/home/pbhak/utilities/src/messages.yml'));
+const messages = yaml.load(readFileSync('src/messages.yml'));
 
 bot.event('member_joined_channel', async event => {
   try {
@@ -41,8 +41,8 @@ async function location_info(lat, lon) {
   return result.address;
 }
 
-const battery_emoji = (battery, charging) => charging ? ':zap:' : (battery <= 20 ? ':low_battery:' : ':battery:')
-const location_emoji = country => (country == 'United States') ? ':us:' : ':globe_with_meridians:'
+const battery_emoji = (battery, charging) => charging ? ':zap:' : (battery <= 20 ? messages.emoji.battery.low : messages.emoji.battery.normal)
+const location_emoji = country => (country == 'United States') ? messages.emojis.country.us : messages.emojis.country.other
 
 async function info(battery, charging, lat, lon) {
   const location = await location_info(lat, lon);
@@ -68,8 +68,7 @@ const server = express();
 server.use(bodyParser.json());
 
 server.get('/', (req, res) => {
-  res.send("hi! you've reached the root endpoint on my info api. maybe check your request uri? - pbhak :)");
-  console.log('GET request received to /')
+  res.send(messages.root);
 });
 
 server.post('/info', (req, res) => {
@@ -92,9 +91,9 @@ server.post('/info', (req, res) => {
 // Start bot and server
 (async () => {
   await bot.start();
-  console.log('application started!');
+  console.log(messages.startup.bot);
 })();
 
 server.listen(process.env.PORT, () => {
-  console.log(`server: started on port ${process.env.PORT}`);
+  console.log(messages.startup.server.replace('{port}', process.env.PORT));
 });

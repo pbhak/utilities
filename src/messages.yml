@@ -12,3 +12,17 @@ stats: |
   phone battery: {battery}
   location: {location}
 #  weather: {weather} 
+
+root: hi! you've reached the root endpoint on my info api. maybe check your request uri? - pbhak :)
+
+startup:
+  bot: 'bot: started!'
+  server: 'server: started on port {port}'
+
+emojis:
+  battery:
+    low: ':low_battery:'
+    normal: ':battery:'
+  country:
+    us: ':us:'
+    other: ':globe_with_meridians:'
