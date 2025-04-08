@@ -4,6 +4,7 @@ import yaml from 'js-yaml';
 import bodyParser from 'body-parser';
 import express from 'express';
 import nominatim from 'nominatim-client';
+import { test_action } from './actions.js';
 
 const geocoding = nominatim.createClient({
   useragent: "pbhak's utilities",            
@@ -16,7 +17,8 @@ const bot = new Bolt.App({
   socketMode: true
 });
 
-const CHANNEL = 'C08H2P5RHA7'; // C01KPAX6AG2 for #bot-testing-ground, C08H2P5RHA7 for #parneel-yaps
+// const CHANNEL = 'C08H2P5RHA7'; // C01KPAX6AG2 for #bot-testing-ground, C08H2P5RHA7 for #parneel-yaps
+const CHANNEL = 'C01KPAX6AG2'
 
 const messages = yaml.load(readFileSync(process.env.YAML_FILE));
 
@@ -46,13 +48,13 @@ const location_emoji = country => (country == 'United States') ? messages.emojis
 
 async function info(battery, charging, lat, lon) {
   const location = await location_info(lat, lon);
-
+  
   try {
     await bot.client.chat.postMessage({
       channel: CHANNEL,
       text: messages.stats
-              .replace('{battery}', `${battery}% ${battery_emoji(battery, charging)}`)
-              .replace('{location}', `${location.city}, ${location.state}  ${location_emoji(location.country)}`)
+      .replace('{battery}', `${battery}% ${battery_emoji(battery, charging)}`)
+      .replace('{location}', `${location.city}, ${location.state}  ${location_emoji(location.country)}`)
     });
   } catch (error) {
     await bot.client.chat.postMessage({
@@ -88,10 +90,51 @@ server.post('/info', (req, res) => {
   res.sendStatus(200);
 });
 
+async function start_action() {
+  try {
+    await bot.client.chat.postMessage({
+      channel: CHANNEL,
+      text: 'test button',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'test!'
+          }
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: 'Primary Button'
+              },
+              action_id: 'hi'
+            }
+          ]
+        }
+      ],
+      // user: 'U07V1ND4H0Q'
+    });
+  } catch (error) {
+    await bot.client.chat.postMessage({
+      channel: CHANNEL,
+      text: messages.error
+    });
+    console.error(error);
+  }
+}
+
+bot.action('hi', test_action);
+
 // Start bot and server
 (async () => {
   await bot.start();
   console.log(messages.startup.bot);
+  start_action()
 })();
 
 server.listen(process.env.PORT, () => {
