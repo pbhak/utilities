@@ -1,73 +1,32 @@
 import Bolt from '@slack/bolt';
-import { readFileSync } from 'node:fs';
 import yaml from 'js-yaml';
-import bodyParser from 'body-parser';
-import express from 'express';
-import nominatim from 'nominatim-client';
-import { test_action } from './actions.js';
+import { readFileSync } from 'node:fs';
+import { member_join, app_mention } from './events.js';
+import { start_server } from './server.js';
 
-const geocoding = nominatim.createClient({
-  useragent: "pbhak's utilities",            
-  referer: 'https://info.pbhak.hackclub.app',  
-});
+// TODO: refactor file, 
+// TODO: split folder structure
+// TODO: clean up imports
 
 const bot = new Bolt.App({
   token: process.env.ACCESS_TOKEN,
   appToken: process.env.SOCKET_TOKEN,
   socketMode: true
 });
+ 
+// TODO: make CHANNEl an environment variable?
+// const CHANNEL = 'C08H2P5RHA7'; // #parneel-yaps
+export const CHANNEL = 'C01KPAX6AG2'  // #bot-testing-ground
 
-// const CHANNEL = 'C08H2P5RHA7'; // C01KPAX6AG2 for #bot-testing-ground, C08H2P5RHA7 for #parneel-yaps
-const CHANNEL = 'C01KPAX6AG2'
+// Read transcript YAML file
+export const messages = yaml.load(readFileSync(process.env.YAML_FILE));
 
-const messages = yaml.load(readFileSync(process.env.YAML_FILE));
 
-bot.event('member_joined_channel', async event => {
-  try {
-    await bot.client.chat.postEphemeral({
-      channel: CHANNEL,
-      text: messages.welcome,
-      user: event.body.event.user
-    });
-  } catch (error) {
-    await bot.client.chat.postMessage({
-      channel: CHANNEL,
-      text: messages.error
-    });
-    console.error(error);
-  }
-});
-
-bot.event('app_mentioned', async event => {
-  try {
-    console.log(event)
-    // });
-  } catch (error) {
-    await bot.client.chat.postMessage({
-      channel: CHANNEL,
-      text: messages.error
-    });
-    console.error(error);
-  }
-});
-
-async function location_info(lat, lon) {
-  const result = await geocoding.reverse({ lat, lon });
-  return result.address;
-}
-
-const battery_emoji = (battery, charging) => charging ? ':zap:' : (battery <= 20 ? messages.emojis.battery.low : messages.emojis.battery.normal)
-const location_emoji = country => (country == 'United States') ? messages.emojis.country.us : messages.emojis.country.other
-
-async function info(battery, charging, lat, lon) {
-  const location = await location_info(lat, lon);
-  
+export async function sendMessage(text) {
   try {
     await bot.client.chat.postMessage({
       channel: CHANNEL,
-      text: messages.stats
-      .replace('{battery}', `${battery}% ${battery_emoji(battery, charging)}`)
-      .replace('{location}', `${location.city}, ${location.state}  ${location_emoji(location.country)}`)
+      text,
     });
   } catch (error) {
     await bot.client.chat.postMessage({
@@ -78,78 +37,16 @@ async function info(battery, charging, lat, lon) {
   }
 }
 
-// Express server
-const server = express();
-server.use(bodyParser.json());
+// Events
 
-server.get('/', (req, res) => {
-  res.send(messages.root);
-});
-
-server.post('/info', (req, res) => {
-  if (
-    req.body.battery == undefined || 
-    req.body.battery < 0 || 
-    req.body.battery > 100 || 
-    req.body.lat == undefined || 
-    req.body.lon == undefined  ||
-    req.body.charging == undefined
-  ) {
-    res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
-    return;
-  }
-  req.body.charging = req.body.charging == 'Yes' ? true : false
-  info(req.body.battery, req.body.charging, req.body.lat, req.body.lon);
-  res.sendStatus(200);
-});
-
-async function start_action() {
-  try {
-    await bot.client.chat.postMessage({
-      channel: CHANNEL,
-      text: 'test button',
-      blocks: [
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: 'test!'
-          }
-        },
-        {
-          type: 'actions',
-          elements: [
-            {
-              type: 'button',
-              text: {
-                type: 'plain_text',
-                text: 'Primary Button'
-              },
-              action_id: 'hi'
-            }
-          ]
-        }
-      ],
-      // user: 'U07V1ND4H0Q'
-    });
-  } catch (error) {
-    await bot.client.chat.postMessage({
-      channel: CHANNEL,
-      text: messages.error
-    });
-    console.error(error);
-  }
-}
-
-bot.action('hi', test_action);
+bot.event('message', async event => member_join(bot, event));
+bot.event('app_mention', async event => app_mention(bot, event));
 
 // Start bot and server
 (async () => {
   await bot.start();
   console.log(messages.startup.bot);
-  start_action()
 })();
 
-server.listen(process.env.PORT, () => {
-  console.log(messages.startup.server.replace('{port}', process.env.PORT));
-});
+start_server()
+
