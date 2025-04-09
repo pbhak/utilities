@@ -1,17 +1,14 @@
-import nominatim from 'nominatim-client';
-import { sendMessage, messages } from './index.js';
 import bodyParser from 'body-parser';
 import express from 'express';
-
-// TODO: clean up imports
-
-// Express server
+import nominatim from 'nominatim-client';
+import { sendMessage, messages } from './index.js';
 
 // Geocoding API
 const geocoding = nominatim.createClient({
   useragent: "pbhak's utilities",            
   referer: 'https://info.pbhak.hackclub.app',  
 });
+
 const battery_emoji = (battery, charging) => charging ? ':zap:' : (battery <= 20 ? messages.emojis.battery.low : messages.emojis.battery.normal)
 const location_emoji = country => (country == 'United States') ? messages.emojis.country.us : messages.emojis.country.other
 
@@ -53,7 +50,7 @@ server.post('/info', (req, res) => {
   res.sendStatus(200);
 });
 
-export function start_server() {
+export default function start_server() {
   server.listen(process.env.PORT, () => {
     console.log(messages.startup.server.replace('{port}', process.env.PORT));
   });
