@@ -3,6 +3,10 @@ import { messages } from "./index.js";
 export { member_join, app_mention };
 
 const member_join = async (bot, event) => {
+  if (event.body.event.channel != 'C08H2P5RHA7') {
+    return;
+  }
+
   try {
     await bot.client.chat.postEphemeral({
       channel: event.body.event.channel,
