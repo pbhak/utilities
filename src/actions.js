@@ -1,6 +1,6 @@
 export async function test_action({ ack, body, client }) { 
   try {
-    ack()
+    await ack()
     
     await client.chat.update({
       channel: body.channel.id,

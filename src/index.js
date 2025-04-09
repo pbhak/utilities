@@ -38,6 +38,19 @@ bot.event('member_joined_channel', async event => {
   }
 });
 
+bot.event('app_mentioned', async event => {
+  try {
+    console.log(event)
+    // });
+  } catch (error) {
+    await bot.client.chat.postMessage({
+      channel: CHANNEL,
+      text: messages.error
+    });
+    console.error(error);
+  }
+});
+
 async function location_info(lat, lon) {
   const result = await geocoding.reverse({ lat, lon });
   return result.address;
