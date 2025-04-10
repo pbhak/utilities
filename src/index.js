@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { member_join, app_mention } from './events.js';
 import start_server  from './server.js';
 import yaml from 'js-yaml';
-import { message_action } from './actions.js';
+import { handleReply, message_action } from './actions.js';
 import { handle_message_action, handle_message_submission } from './views.js';
 
 export { messages, sendMessage };
@@ -45,6 +45,7 @@ bot.event('app_mention', async event => app_mention(bot, event));
 
 // Actions
 bot.action('send_message', handle_message_action);
+bot.action('reply_clicked', handleReply);
 
 // Views
 bot.view('e', handle_message_submission);

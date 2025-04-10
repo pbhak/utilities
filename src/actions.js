@@ -1,6 +1,8 @@
 import { messages } from "./index.js";
 
-export async function message_action(client, channel) {
+export { message_action, handleReply };
+
+async function message_action(client, channel) {
   try {
     await client.chat.postMessage({
       channel: channel,
@@ -28,4 +30,8 @@ export async function message_action(client, channel) {
     });
     console.error(error);
   }
+}
+
+async function handleReply() {
+
 }
