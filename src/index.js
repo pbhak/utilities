@@ -3,8 +3,7 @@ import { readFileSync } from 'node:fs';
 import { member_join, app_mention } from './events.js';
 import start_server  from './server.js';
 import yaml from 'js-yaml';
-import { handleReply, message_action } from './actions.js';
-import { handle_message_action, handle_message_submission } from './views.js';
+import { openMessageView, handleMessageSubmission, handleReplySubmission, openReplyView } from './views.js';
 
 export { messages, sendMessage };
 
@@ -40,21 +39,21 @@ async function sendMessage(text) {
 }
 
 // Events
-bot.event('member_joined_channel', async event => member_join(bot, event));
+bot.event('message', async event => member_join(bot, event));
 bot.event('app_mention', async event => app_mention(bot, event));
 
 // Actions
-bot.action('send_message', handle_message_action);
-bot.action('reply_clicked', handleReply);
+bot.action('send_message', openMessageView);
+bot.action('reply_clicked', openReplyView);
 
-// Views
-bot.view('e', handle_message_submission);
+// View callbacks
+bot.view('messageViewSubmitted', handleMessageSubmission);
+bot.view('replyViewSubmitted', handleReplySubmission);
 
 // Start bot and server
 (async () => {
   await bot.start();
   console.log(messages.startup.bot);
-  message_action(bot.client, CHANNEL)
 })();
 
 start_server()

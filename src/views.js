@@ -1,15 +1,18 @@
-export { handle_message_action, handle_message_submission };
+import { messages } from './index.js'
 
-async function handle_message_action({ ack, body, client }) {
+export { openMessageView, openReplyView };
+export { handleMessageSubmission, handleReplySubmission };
+
+async function openMessageView({ ack, body, client }) {
     await ack()
 
     try {
       await client.views.open({
         trigger_id: body.trigger_id,
         view: {
-          callback_id: 'e',
+          callback_id: 'messageViewSubmitted',
           type: 'modal',
-          private_metadata: `[${body.message.ts}, "${body.container.channel_id}", "${body.user.id}"]`,
+          private_metadata: JSON.stringify({ts: body.message.ts, cid: body.container.channel_id, uid: body.user.id}),
           title: {
             type: 'plain_text',
             text: 'top text',
@@ -51,7 +54,64 @@ async function handle_message_action({ ack, body, client }) {
     }
 }
 
-async function handle_message_submission ({ ack, client, payload }) {
+async function openReplyView({ ack, body, client }) {
+  await ack();
+
+  console.log(body)
+
+  try {
+    await client.views.open({
+      trigger_id: body.trigger_id,
+      view: {
+        callback_id: 'replyViewSubmitted',
+        type: 'modal',
+        private_metadata: JSON.stringify({
+          ts: body.message.ts, 
+          cid: body.container.channel_id, 
+          uid: body.message.text.match(/<@(\w+)>/)[1],
+          message: body.message.text.match(/(?<=said: ).*/)[0]
+        }),
+        title: {
+          type: 'plain_text',
+          text: 'top text'
+        },
+        submit: {
+          type: 'plain_text',
+          text: 'Send'
+        },
+        close: {
+          type: 'plain_text',
+          text: 'Cancel',
+        },
+        blocks: [
+          {
+            type: 'input',
+            block_id: 'reply',
+            label: {
+              type: 'plain_text',
+              text: 'reply:'
+            },
+            element: {
+              type: 'plain_text_input',
+              action_id: 'input',
+              multiline: false
+            }
+          }
+        ]
+      }
+    });
+  } catch (error) {
+    await client.chat.postMessage({
+      channel: body.container.channel_id,
+      text: messages.error
+    });
+    console.error(error);
+  }
+}
+
+// Callbacks
+
+async function handleMessageSubmission({ ack, client, payload }) {
   await ack({
     response_action: 'clear'
   });
@@ -59,29 +119,20 @@ async function handle_message_submission ({ ack, client, payload }) {
   const metadata = JSON.parse(payload.private_metadata)
   
   await client.chat.update({
-    channel: metadata[1],
-    ts: metadata[0],
-    text: 'test button',
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'message sent!'
-        }
-      },
-    ]
+    channel: metadata.cid,
+    ts: metadata.ts,
+    text: 'message sent!'
   });
 
   await client.chat.postMessage({
     channel: 'U07V1ND4H0Q',
-    text: `<@${metadata[2]}> said: ${payload.state.values.message.input.value}`,
+    text: `<@${metadata.uid}> said: ${payload.state.values.message.input.value}`,
     blocks: [
       {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `<@${metadata[2]}> said: ${payload.state.values.message.input.value}`
+          text: `<@${metadata.uid}> said: ${payload.state.values.message.input.value}`
         }
       },
       {
@@ -96,5 +147,49 @@ async function handle_message_submission ({ ack, client, payload }) {
         }]
       }
   ]
+  });
+}
+
+async function handleReplySubmission({ ack, client, payload }) {
+  await ack();
+  const metadata = JSON.parse(payload.private_metadata)
+
+  console.log(metadata)
+  
+  await client.chat.update({
+    ts: metadata.ts,
+    channel: metadata.cid,
+    text: 'reply sent!'
+  });
+
+  await client.chat.postMessage({
+    channel: metadata.uid,
+    blocks: [{
+			type: 'rich_text',
+      text: `@pbhak replied: ${payload.state.values.reply.input.value}`,		
+      elements: [
+				{
+					type: 'rich_text_quote',
+					elements: [{
+							type: 'text',
+							text: metadata.message
+						
+          }]
+				},
+				{
+					type: 'rich_text_section',
+					elements: [
+						{
+							type: 'user',
+							user_id: 'U07V1ND4H0Q' // me
+						},
+						{
+							type: 'text',
+							text: ` replied: ${payload.state.values.reply.input.value}`
+						}
+					]
+				}
+			]
+		}]
   });
 }
