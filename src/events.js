@@ -1,37 +1,74 @@
-import { messages } from "./index.js";
+import { messages } from './index.js';
 
 export { member_join, app_mention };
 
-const member_join = async (bot, event) => {
-  if (event.body.event.channel != 'C08H2P5RHA7') {
-    return;
-  }
+async function member_join({ event, body, client }) {
+  // if (event.channel != 'C08H2P5RHA7') {
+  //   return;
+  // }
 
   try {
-    await bot.client.chat.postEphemeral({
-      channel: event.body.event.channel,
+    await client.chat.postEphemeral({
+      channel: event.channel,
       text: messages.welcome,
-      user: event.body.event.user
+      user: event.user
+    });
+
+    await client.chat.postEphemeral({
+      channel: body.event.channel,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'hi'
+          }
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: 'sure!'
+              },
+              style: 'primary',
+              action_id: 'showWelcomeMessage'
+            },
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: 'nah'
+              },
+              style: 'danger',
+              action_id: 'dontShowWelcomeMessage'
+            }
+          ]
+        }
+      ],
+      user: event.user
     });
   } catch (error) {
-    await bot.client.chat.postMessage({
-      channel: event.body.event.channel,
+    await client.chat.postMessage({
+      channel: event.channel,
       text: messages.error
     });
     console.error(error);
   }
 }
 
-const app_mention = async (bot, event) => {
+async function app_mention({ client, event }) {
   try {
-    await event.client.reactions.add({
-      channel: event.body.event.channel,
+    await client.reactions.add({
+      channel: event.channel,
       name: 'hyper-dino-wave',
-      timestamp: event.body.event.ts
+      timestamp: event.ts
     });
   } catch (error) {
-    await bot.client.chat.postMessage({
-      channel: event.body.event.channel,
+    await client.chat.postMessage({
+      channel: event.channel,
       text: messages.error
     });
     console.error(error);

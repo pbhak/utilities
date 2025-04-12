@@ -15,18 +15,15 @@ async function openMessageView({ ack, body, client }) {
           private_metadata: JSON.stringify({ts: body.message.ts, cid: body.container.channel_id, uid: body.user.id}),
           title: {
             type: 'plain_text',
-            text: 'top text',
-            emoji: true
+            text: 'top text'
           },
           submit: {
             type: 'plain_text',
-            text: 'Send',
-            emoji: true
+            text: 'Send'
           },
           close: {
             type: 'plain_text',
-            text: 'Cancel',
-            emoji: true
+            text: 'Cancel'
           },
           blocks: [
             {
@@ -56,8 +53,6 @@ async function openMessageView({ ack, body, client }) {
 
 async function openReplyView({ ack, body, client }) {
   await ack();
-
-  console.log(body)
 
   try {
     await client.views.open({
@@ -118,7 +113,7 @@ async function handleMessageSubmission({ ack, client, payload }) {
 
   const metadata = JSON.parse(payload.private_metadata)
   
-  await client.chat.update({
+  await client.chat.update({ // ISSUE IS HERE
     channel: metadata.cid,
     ts: metadata.ts,
     text: 'message sent!'
@@ -153,8 +148,6 @@ async function handleMessageSubmission({ ack, client, payload }) {
 async function handleReplySubmission({ ack, client, payload }) {
   await ack();
   const metadata = JSON.parse(payload.private_metadata)
-
-  console.log(metadata)
   
   await client.chat.update({
     ts: metadata.ts,
@@ -166,14 +159,12 @@ async function handleReplySubmission({ ack, client, payload }) {
     channel: metadata.uid,
     blocks: [{
 			type: 'rich_text',
-      text: `@pbhak replied: ${payload.state.values.reply.input.value}`,		
       elements: [
 				{
 					type: 'rich_text_quote',
 					elements: [{
 							type: 'text',
 							text: metadata.message
-						
           }]
 				},
 				{

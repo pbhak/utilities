@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { member_join, app_mention } from './events.js';
 import start_server  from './server.js';
 import yaml from 'js-yaml';
+import { dontSendWelcomeMessage, sendWelcomeMessage } from './actions.js';
 import { openMessageView, handleMessageSubmission, handleReplySubmission, openReplyView } from './views.js';
 
 export { messages, sendMessage };
@@ -12,11 +13,6 @@ const bot = new Bolt.App({
   appToken: process.env.SOCKET_TOKEN,
   socketMode: true
 });
-
-// todo:
-// - make modal for sending/replying messages and have it go off of a button (?)
-// - get dms working
-// - solder headers?
  
 const CHANNEL = process.env.CHANNEL
 
@@ -39,12 +35,14 @@ async function sendMessage(text) {
 }
 
 // Events
-bot.event('message', async event => member_join(bot, event));
-bot.event('app_mention', async event => app_mention(bot, event));
+bot.event('message', member_join);
+bot.event('app_mention', app_mention);
 
 // Actions
 bot.action('send_message', openMessageView);
 bot.action('reply_clicked', openReplyView);
+bot.action('showWelcomeMessage', sendWelcomeMessage)
+bot.action('dontShowWelcomeMessage', dontSendWelcomeMessage);
 
 // View callbacks
 bot.view('messageViewSubmitted', handleMessageSubmission);
