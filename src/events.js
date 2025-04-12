@@ -3,15 +3,15 @@ import { messages } from './index.js';
 export { member_join, app_mention };
 
 async function member_join({ event, body, client }) {
-  // if (event.channel != 'C08H2P5RHA7') {
-  //   return;
-  // }
+  if (event.channel != 'C08H2P5RHA7') {
+    // return; // because we don't want it welcoming people in other channels
+  }
 
   try {
     await client.chat.postEphemeral({
       channel: event.channel,
       text: messages.welcome,
-      user: event.user
+      user: event.user ?? event.message.user // to account for edited messages
     });
 
     await client.chat.postEphemeral({
@@ -21,7 +21,7 @@ async function member_join({ event, body, client }) {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: 'hi'
+            text: 'do you want to be publicly welcomed?'
           }
         },
         {
@@ -48,7 +48,7 @@ async function member_join({ event, body, client }) {
           ]
         }
       ],
-      user: event.user
+      user: event.user ?? event.message.user
     });
   } catch (error) {
     await client.chat.postMessage({

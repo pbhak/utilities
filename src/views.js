@@ -106,21 +106,26 @@ async function openReplyView({ ack, body, client }) {
 
 // Callbacks
 
-async function handleMessageSubmission({ ack, client, payload }) {
+async function handleMessageSubmission({ ack, body, client, payload }) {
   await ack({
     response_action: 'clear'
   });
 
   const metadata = JSON.parse(payload.private_metadata)
   
-  await client.chat.update({ // ISSUE IS HERE
+  await client.chat.update({
     channel: metadata.cid,
     ts: metadata.ts,
+    text: `welcome to my channel <@${body.user.id}>!`
+  });
+  
+  await client.chat.postMessage({
+    channel: metadata.cid,
     text: 'message sent!'
   });
 
   await client.chat.postMessage({
-    channel: 'U07V1ND4H0Q',
+    channel: 'U07V1ND4H0Q', // my dms :p
     text: `<@${metadata.uid}> said: ${payload.state.values.message.input.value}`,
     blocks: [
       {

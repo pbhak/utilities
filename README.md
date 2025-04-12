@@ -1,5 +1,5 @@
 # pbhak's utilities
-_a small bot I made for my channel in the Hack Club Slack_
+_a small bot I made for my channel (#parneel-yaps, you should join) in the Hack Club Slack_
 
 ## Running locally
 make sure the `ACCESS_TOKEN`, `SOCKET_TOKEN`, and `YAML_FILE` environment variables are provided!
