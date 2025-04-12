@@ -61,11 +61,19 @@ async function member_join({ event, body, client }) {
 
 async function app_mention({ client, event }) {
   try {
-    await client.reactions.add({
-      channel: event.channel,
-      name: 'hyper-dino-wave',
-      timestamp: event.ts
-    });
+    if (event.text.includes(':hyper-dino-wave:')) {
+      await client.reactions.add({
+        channel: event.channel,
+        name: 'hyper-dino-wave-flip',
+        timestamp: event.ts
+      });
+    } else {
+      await client.reactions.add({
+        channel: event.channel,
+        name: 'hyper-dino-wave',
+        timestamp: event.ts
+      });
+    }
   } catch (error) {
     await client.chat.postMessage({
       channel: event.channel,
