@@ -116,7 +116,7 @@ async function handleMessageSubmission({ ack, body, client, payload }) {
   await client.chat.update({
     channel: metadata.cid,
     ts: metadata.ts,
-    text: `welcome to my channel <@${body.user.id}>!`
+    text: messages.welcome.public.replace('{user}', `<@${body.user.id}>`)
   });
   
   await client.chat.postMessage({

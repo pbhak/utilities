@@ -1,9 +1,14 @@
-welcome: |
-  hey! thanks for joining my channel :)
-  feel free to ping me if you need something, or if you just want to talk - if i'm not currently active i'll get back to you as soon i get online
+welcome:
+  initial: |
+    hey! thanks for joining my channel :)
+    feel free to ping me if you need something, or if you just want to talk - if i'm not currently active i'll get back to you as soon i get online
 
-  oh and also, join the channels in the neighbors tab! they're all cool people (feel free to add yourself asw)
-  have a good one!
+    oh and also, join the channels in the neighbors tab! they're all cool people (feel free to add yourself asw)
+    have a good one!
+  question: do you want to be publicly welcomed?
+  public: welcome to my channel {user}!
+  private: alright, no problem boss!
+  private_dm: user {user} has joined the channel!
 
 error: An error has occurred - see console for more information
 

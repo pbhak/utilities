@@ -10,7 +10,7 @@ async function member_join({ event, body, client }) {
   try {
     await client.chat.postEphemeral({
       channel: event.channel,
-      text: messages.welcome,
+      text: messages.welcome.initial,
       user: event.user ?? event.message.user // to account for edited messages
     });
 
@@ -21,7 +21,7 @@ async function member_join({ event, body, client }) {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: 'do you want to be publicly welcomed?'
+            text: messages.welcome.question
           }
         },
         {

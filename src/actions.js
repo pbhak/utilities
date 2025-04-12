@@ -9,16 +9,18 @@ async function sendWelcomeMessage({ ack, body, client, respond }) {
     delete_original: true
   })
 
+  const welcome_message = messages.welcome.public.replace('{user}', `<@${body.user.id}>`)
+
   try {
     await client.chat.postMessage({
       channel: body.channel.id,
-      text: `welcome to my channel <@${body.user.id}>!`,
+      text: welcome_message,
       blocks: [
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `welcome to my channel <@${body.user.id}>!`
+            text: welcome_message
           }
         },
         {
@@ -50,7 +52,7 @@ async function dontSendWelcomeMessage({ ack, body, client, respond }) {
 
   await client.chat.postEphemeral({
     channel: body.channel.id,
-    text: 'alright, no problem boss!',
+    text: messages.welcome.private,
     user: body.user.id
   });
 
@@ -60,7 +62,7 @@ async function dontSendWelcomeMessage({ ack, body, client, respond }) {
 
   await client.chat.postMessage({
     channel: 'U07V1ND4H0Q', // my dms
-    text: `user <@${body.user.id}> has joined the channel!`
+    text: messages.welcome.private_dm.replace('{user}', `<@${body.user.id}>`)
   });
 }
 
