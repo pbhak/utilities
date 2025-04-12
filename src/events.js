@@ -3,8 +3,8 @@ import { messages } from './index.js';
 export { member_join, app_mention };
 
 async function member_join({ event, body, client }) {
-  if (event.channel != 'C08H2P5RHA7') {
-    // return; // because we don't want it welcoming people in other channels
+  if (event.channel != 'C08H2P5RHA7' || event.user.is_bot) {
+    // return; // because we don't want it welcoming people in other channels or bots
   }
 
   try {
@@ -14,8 +14,25 @@ async function member_join({ event, body, client }) {
       user: event.user ?? event.message.user // to account for edited messages
     });
 
+    const all_members = await client.conversations.members({ channel: event.channel });
+    let numberOfUsers = 0;
+    await Promise.all(all_members.members.map(async (userId) => {
+      const user = await client.users.info({ user: userId })
+      if (!user.user.is_bot) {
+        numberOfUsers++;
+      }
+    }))
+
+    if ((numberOfUsers % 10) == 0) {
+      await client.chat.postMessage({
+        channel: event.channel,
+        text: `we just hit ${numberOfUsers} members!`
+      })
+    }
+
     await client.chat.postEphemeral({
       channel: body.event.channel,
+      text: 'want to be publicly welcomed?',
       blocks: [
         {
           type: 'section',

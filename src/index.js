@@ -35,13 +35,14 @@ async function sendMessage(text) {
 }
 
 // Events
-bot.event('member_joined_channel', member_join);
+bot.event('message', member_join);
 bot.event('app_mention', app_mention);
 
 // Actions
 bot.action('send_message', openMessageView);
+bot.action('replyAgain', openMessageView);
 bot.action('reply_clicked', openReplyView);
-bot.action('showWelcomeMessage', sendWelcomeMessage)
+bot.action('showWelcomeMessage', sendWelcomeMessage);
 bot.action('dontShowWelcomeMessage', dontSendWelcomeMessage);
 
 // View callbacks

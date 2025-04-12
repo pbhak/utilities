@@ -162,30 +162,27 @@ async function handleReplySubmission({ ack, client, payload }) {
 
   await client.chat.postMessage({
     channel: metadata.uid,
-    blocks: [{
-			type: 'rich_text',
-      elements: [
-				{
-					type: 'rich_text_quote',
-					elements: [{
-							type: 'text',
-							text: metadata.message
-          }]
-				},
-				{
-					type: 'rich_text_section',
-					elements: [
-						{
-							type: 'user',
-							user_id: 'U07V1ND4H0Q' // me
-						},
-						{
-							type: 'text',
-							text: ` replied: ${payload.state.values.reply.input.value}`
-						}
-					]
-				}
-			]
-		}]
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `> ${metadata.message} \n <@U07V1ND4H0Q> replied: ${payload.state.values.reply.input.value}`
+        }
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: 'reply'
+            },
+            action_id: 'replyAgain'
+          }
+        ]
+      }
+    ]
   });
 }

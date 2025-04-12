@@ -65,4 +65,3 @@ async function dontSendWelcomeMessage({ ack, body, client, respond }) {
     text: messages.welcome.private_dm.replace('{user}', `<@${body.user.id}>`)
   });
 }
-
