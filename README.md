@@ -1,4 +1,6 @@
 # pbhak's utilities
+![Hackatime Badge](https://badge.pbhak.hackclub.app/slack_user_id/project_name)
+
 _a small bot I made for my channel (#parneel-yaps, you should join) in the Hack Club Slack_
 
 ## Features
