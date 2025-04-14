@@ -1,5 +1,5 @@
 # pbhak's utilities
-![Hackatime Badge](https://badge.pbhak.hackclub.app/U07V1ND4H0Q/utilities)
+![Hackatime Badge](https://hackatime-badge.hackclub.com/U07V1ND4H0Q/utilities)
 
 _a small bot I made for my channel (#parneel-yaps, you should join) in the Hack Club Slack_
 
