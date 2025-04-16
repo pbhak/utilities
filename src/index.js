@@ -5,6 +5,7 @@ import start_server  from './server.js';
 import yaml from 'js-yaml';
 import { dontSendWelcomeMessage, sendWelcomeMessage } from './actions.js';
 import { openMessageView, handleMessageSubmission, handleReplySubmission, openReplyView } from './views.js';
+import { shenanigans } from './commands.js';
 
 export { messages, sendMessage };
 
@@ -48,6 +49,9 @@ bot.action('dontShowWelcomeMessage', dontSendWelcomeMessage);
 // View callbacks
 bot.view('messageViewSubmitted', handleMessageSubmission);
 bot.view('replyViewSubmitted', handleReplySubmission);
+
+// Slash commands
+bot.command('/shenanigans', shenanigans);
 
 // Start bot and server
 (async () => {

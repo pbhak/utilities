@@ -4,7 +4,7 @@ export { member_join, app_mention };
 
 async function member_join({ event, body, client }) {
   if (event.channel != 'C08H2P5RHA7' || event.user.is_bot) {
-    // return; // because we don't want it welcoming people in other channels or bots
+    return; // because we don't want it welcoming people in other channels or bots
   }
 
   try {
