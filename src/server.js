@@ -28,7 +28,7 @@ async function info(battery, charging, lat, lon) {
 }
 
 const server = express();
-server.use(bodyParser.json());
+server.use(bodyParser.json(), cors());
 
 server.get('/', (req, res) => {
   res.send(messages.root);
@@ -51,7 +51,7 @@ server.post('/info', (req, res) => {
   res.sendStatus(200);
 });
 
-server.get('/online', [cors()],async (req, res) => {
+server.get('/online', cors() ,async (req, res) => {
   res.send(await getUserInfo());
 });
 
