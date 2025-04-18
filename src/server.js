@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import nominatim from 'nominatim-client';
 import { sendMessage, messages, getUserInfo } from './index.js';
@@ -50,7 +51,7 @@ server.post('/info', (req, res) => {
   res.sendStatus(200);
 });
 
-server.get('/online', async (req, res) => {
+server.get('/online', [cors()],async (req, res) => {
   res.send(await getUserInfo());
 });
 
