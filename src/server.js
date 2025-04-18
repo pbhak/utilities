@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 import nominatim from 'nominatim-client';
-import { sendMessage, messages } from './index.js';
+import { sendMessage, messages, getUserInfo } from './index.js';
 
 // Geocoding API
 const geocoding = nominatim.createClient({
@@ -48,6 +48,10 @@ server.post('/info', (req, res) => {
   req.body.charging = req.body.charging == 'Yes' ? true : false
   info(req.body.battery, req.body.charging, req.body.lat, req.body.lon);
   res.sendStatus(200);
+});
+
+server.get('/online', async (req, res) => {
+  res.send(await getUserInfo());
 });
 
 export default function start_server() {

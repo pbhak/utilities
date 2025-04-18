@@ -1,6 +1,6 @@
 export async function shenanigans({ ack, command, client }) {
   await ack();
-  const allowed_ids = ['U07V1NDd4H0Q']
+  const allowed_ids = ['U07V1NDH0Q']
 
   if (!allowed_ids.includes(command.user_id)) {
     await client.chat.postEphemeral({

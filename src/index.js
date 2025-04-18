@@ -7,7 +7,7 @@ import { dontSendWelcomeMessage, sendWelcomeMessage } from './actions.js';
 import { openMessageView, handleMessageSubmission, handleReplySubmission, openReplyView } from './views.js';
 import { shenanigans } from './commands.js';
 
-export { messages, sendMessage };
+export { messages, sendMessage, getUserInfo };
 
 const bot = new Bolt.App({
   token: process.env.ACCESS_TOKEN,
@@ -33,6 +33,13 @@ async function sendMessage(text) {
     });
     console.error(error);
   }
+}
+
+async function getUserInfo() {
+  const presence = await bot.client.users.getPresence({
+    user: 'U07V1ND4H0Q'
+  });
+  return presence.presence == 'active';
 }
 
 // Events
