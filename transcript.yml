@@ -30,3 +30,15 @@ emojis:
   country:
     us: ':us:'
     other: ':globe_with_meridians:'
+
+private:
+  invite: |
+    hi! if you're seeing this, you're a pretty cool person :)
+    i've invited you to join my private channel, #parneel-reflects. 
+    you can join if you want, but if you don't want to, it's no problem!
+  invite_edit: channel joined :)
+  welcome: |
+    hi, welcome to my private channel! thanks for being an amazing person, it means a lot :D
+    sometimes you can catch me talking about life or just thinking about stuff.
+    feel free to chat or hang out here, i don't mind :)
+    have a good one!
