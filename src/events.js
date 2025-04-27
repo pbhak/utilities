@@ -111,11 +111,6 @@ async function app_mention({ client, event }) {
       timestamp: event.ts,
     });
   }
-  await client.chat.postMessage({
-    channel: event.channel,
-    text: messages.error,
-  });
-  console.error(error);
 }
 
 async function home_opened({ client, event }) {
