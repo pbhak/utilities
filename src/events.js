@@ -98,27 +98,24 @@ async function member_join_private({ event, body, client }) {
 }
 
 async function app_mention({ client, event }) {
-  try {
-    if (event.text.includes(":hyper-dino-wave:")) {
-      await client.reactions.add({
-        channel: event.channel,
-        name: "hyper-dino-wave-flip",
-        timestamp: event.ts,
-      });
-    } else {
-      await client.reactions.add({
-        channel: event.channel,
-        name: "hyper-dino-wave",
-        timestamp: event.ts,
-      });
-    }
-  } catch (error) {
-    await client.chat.postMessage({
+  if (event.text.includes(":hyper-dino-wave:")) {
+    await client.reactions.add({
       channel: event.channel,
-      text: messages.error,
+      name: "hyper-dino-wave-flip",
+      timestamp: event.ts,
     });
-    console.error(error);
+  } else {
+    await client.reactions.add({
+      channel: event.channel,
+      name: "hyper-dino-wave",
+      timestamp: event.ts,
+    });
   }
+  await client.chat.postMessage({
+    channel: event.channel,
+    text: messages.error,
+  });
+  console.error(error);
 }
 
 async function home_opened({ client, event }) {

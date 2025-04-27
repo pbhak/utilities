@@ -62,6 +62,7 @@ server.post("/info", (req, res) => {
 });
 
 server.get("/online", async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "https://pbhak.dev");
   res.send(await getUserInfo());
 });
 
