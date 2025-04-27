@@ -55,7 +55,7 @@ async function getUserInfo() {
 }
 
 // Events
-bot.event("message", member_join);
+bot.event("member_joined_channel", member_join);
 bot.event("app_mention", app_mention);
 bot.event("app_home_opened", home_opened);
 
