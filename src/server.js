@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import nominatim from "nominatim-client";
 import { sendMessage, messages, getUserInfo } from "./index.js";
+import { sha256 } from "js-sha256/index.js";
 
 // Geocoding API
 const geocoding = nominatim.createClient({
@@ -45,6 +46,16 @@ server.get("/", (req, res) => {
 });
 
 server.post("/info", (req, res) => {
+  if (
+    !(
+      req.get("X-Api-Key") &&
+      sha256(req.get("X-Api-Key")) === process.env.API_KEY_HASH
+    )
+  ) {
+    res.sendStatus(403); // Invalid API key - we don't want random people sending in data!
+    return;
+  }
+
   if (
     req.body.battery == undefined ||
     req.body.battery < 0 ||
