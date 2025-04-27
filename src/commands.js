@@ -1,8 +1,11 @@
-export async function shenanigans({ ack, command, client }) {
+import { sha256 as sha256_hash } from "js-sha256";
+export { shenanigans, sha256 };
+
+async function shenanigans({ ack, command, client }) {
   await ack();
   const allowed_ids = ["U07V1ND4H0Q"];
 
-  if (!(allowed_ids.includes(command.user_id))) {
+  if (!allowed_ids.includes(command.user_id)) {
     await client.chat.postEphemeral({
       channel: command.channel_id,
       user: command.user_id,
@@ -27,5 +30,16 @@ export async function shenanigans({ ack, command, client }) {
         },
       },
     ],
+  });
+}
+
+async function sha256({ ack, command, client }) {
+  await ack();
+
+  const hash = sha256_hash(command.text);
+  await client.chat.postEphemeral({
+    channel: command.channel_id,
+    user: command.user_id,
+    text: `here's your requested hash! \`${hash}\``,
   });
 }

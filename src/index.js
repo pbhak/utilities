@@ -17,7 +17,7 @@ import {
   openPrivateChannelView,
   addToPrivateChannel,
 } from "./views.js";
-import { shenanigans } from "./commands.js";
+import { sha256, shenanigans } from "./commands.js";
 
 export { messages, sendMessage, getUserInfo };
 
@@ -76,6 +76,7 @@ bot.view("privateChannelViewSubmitted", addToPrivateChannel);
 
 // Slash commands
 bot.command("/shenanigans", shenanigans);
+bot.command("/sha256", sha256);
 
 // Start bot and server
 (async () => {

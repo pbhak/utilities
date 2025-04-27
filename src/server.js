@@ -2,7 +2,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import nominatim from "nominatim-client";
 import { sendMessage, messages, getUserInfo } from "./index.js";
-import { sha256 } from "js-sha256/index.js";
+import { sha256 } from "js-sha256";
 
 // Geocoding API
 const geocoding = nominatim.createClient({
