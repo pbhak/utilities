@@ -1,5 +1,4 @@
 import bodyParser from "body-parser";
-import cors from "cors";
 import express from "express";
 import nominatim from "nominatim-client";
 import { sendMessage, messages, getUserInfo } from "./index.js";
@@ -7,7 +6,7 @@ import { sendMessage, messages, getUserInfo } from "./index.js";
 // Geocoding API
 const geocoding = nominatim.createClient({
   useragent: "pbhak's utilities",
-  referer: "https://info.pbhak.hackclub.app",
+  referer: "https://utilities.pbhak.dev",
 });
 
 const battery_emoji = (battery, charging) =>
@@ -63,7 +62,6 @@ server.post("/info", (req, res) => {
 });
 
 server.get("/online", async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "https://pbhak.dev");
   res.send(await getUserInfo());
 });
 
