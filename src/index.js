@@ -16,6 +16,7 @@ import {
   openReplyView,
   openPrivateChannelView,
   addToPrivateChannel,
+  welcomeInjection,
 } from "./views.js";
 import { sha256, shenanigans } from "./commands.js";
 
@@ -48,10 +49,10 @@ async function sendMessage(text) {
 }
 
 async function getUserInfo() {
-  const presence = await bot.client.users.getPresence({
+  const status = await bot.client.users.getPresence({
     user: "U07V1ND4H0Q",
   });
-  return presence.presence == "active";
+  return status.presence == "active";
 }
 
 // Events
@@ -61,7 +62,7 @@ bot.event("app_home_opened", home_opened);
 
 // Actions
 bot.action("send_message", openMessageView);
-bot.action("replyAgain", openMessageView);
+bot.action("replyAgain", welcomeInjection, openMessageView);
 bot.action("reply_clicked", openReplyView);
 bot.action("showWelcomeMessage", sendWelcomeMessage);
 bot.action("dontShowWelcomeMessage", dontSendWelcomeMessage);

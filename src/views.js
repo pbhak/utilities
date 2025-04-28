@@ -1,9 +1,18 @@
 import { messages } from "./index.js";
 
+export { welcomeInjection };
 export { openMessageView, openReplyView, openPrivateChannelView };
 export { handleMessageSubmission, handleReplySubmission, addToPrivateChannel };
 
-async function openMessageView({ ack, body, client }) {
+async function welcomeInjection({ context, next }) {
+  // When calling the replyAgain action, this function is introduced as middleware to
+  // inject a welcome boolean into the context that results in the bot not welcoming the user
+  // for a second time/
+  context.doNotWelcome = true;
+  await next();
+}
+
+async function openMessageView({ ack, body, client, context }) {
   await ack();
 
   try {
@@ -16,6 +25,7 @@ async function openMessageView({ ack, body, client }) {
           ts: body.message.ts,
           cid: body.container.channel_id,
           uid: body.user.id,
+          doNotWelcome: context.doNotWelcome
         }),
         title: {
           type: "plain_text",
@@ -151,11 +161,13 @@ async function handleMessageSubmission({ ack, body, client, payload }) {
 
   const metadata = JSON.parse(payload.private_metadata);
 
-  await client.chat.update({
-    channel: metadata.cid,
-    ts: metadata.ts,
-    text: messages.welcome.public.replace("{user}", `<@${body.user.id}>`),
-  });
+  if (!metadata.doNotWelcome) {
+    await client.chat.update({
+      channel: metadata.cid,
+      ts: metadata.ts,
+      text: messages.welcome.public.replace("{user}", `<@${body.user.id}>`),
+    });
+  }
 
   await client.chat.postMessage({
     channel: metadata.cid,
@@ -197,7 +209,7 @@ async function handleReplySubmission({ ack, client, payload }) {
   await client.chat.update({
     ts: metadata.ts,
     channel: metadata.cid,
-    text: "reply sent!",
+    text: `> ${payload.state.values.reply.input.value} \nreply sent!`,
   });
 
   await client.chat.postMessage({
@@ -229,33 +241,33 @@ async function handleReplySubmission({ ack, client, payload }) {
 
 async function addToPrivateChannel({ ack, client, payload }) {
   await ack();
-  payload.state.values.usersToAdd.users.selected_users.forEach(async id => {
+  payload.state.values.usersToAdd.users.selected_users.forEach(async (id) => {
     await client.chat.postMessage({
       channel: id,
       text: messages.private.invite,
       blocks: [
         {
-          type: 'section',
+          type: "section",
           text: {
-            type: 'mrkdwn',
-            text: messages.private.invite
-          }
+            type: "mrkdwn",
+            text: messages.private.invite,
+          },
         },
         {
-          type: 'actions',
+          type: "actions",
           elements: [
             {
-              type: 'button',
+              type: "button",
               text: {
-                type: 'plain_text',
-                text: 'join'
+                type: "plain_text",
+                text: "join",
               },
-              style: 'primary',
-              action_id: 'join_private_channel'
-            }
-          ]
-        }
-      ]
+              style: "primary",
+              action_id: "join_private_channel",
+            },
+          ],
+        },
+      ],
     });
   });
 }

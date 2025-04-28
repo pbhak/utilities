@@ -42,7 +42,7 @@ const server = express();
 server.use(bodyParser.json());
 
 server.get("/", (req, res) => {
-  res.send(messages.root);
+  res.redirect('https://github.com/pbhak/utilities');
 });
 
 server.post("/info", (req, res) => {
