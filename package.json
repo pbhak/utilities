@@ -22,7 +22,6 @@
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "js-sha256": "^0.11.0",
     "js-yaml": "^4.1.0",
     "nominatim-client": "^3.2.1"
   }

@@ -2,7 +2,6 @@ import bodyParser from "body-parser";
 import express from "express";
 import nominatim from "nominatim-client";
 import { sendMessage, messages, getUserInfo } from "./index.js";
-import { sha256 } from "js-sha256";
 
 // Geocoding API
 const geocoding = nominatim.createClient({
@@ -42,17 +41,27 @@ const server = express();
 server.use(bodyParser.json());
 
 server.get("/", (req, res) => {
-  res.redirect('https://github.com/pbhak/utilities');
+  res.redirect("https://github.com/pbhak/utilities");
 });
 
 server.post("/info", (req, res) => {
+  if (!req.get("X-Api-Key")) {
+    res.sendStatus(403);
+    return;
+  }
+
+  const givenKeyHash = Buffer.from(
+    new CryptoHasher("sha256").update(req.get("X-Api-Key")).digest("hex")
+  );
+
+  const keyHash = Buffer.from(process.env.API_KEY_HASH);
+
   if (
-    !(
-      req.get("X-Api-Key") &&
-      sha256(req.get("X-Api-Key")) === process.env.API_KEY_HASH
-    )
+    givenKeyHash.length !== keyHash.length ||
+    !crypto.timingSafeEqual(givenKeyHash, keyHash)
   ) {
-    res.sendStatus(403); // Invalid API key - we don't want random people sending in data!
+    // because we don't want random people sending stats data, that could be bad
+    res.sendStatus(403); 
     return;
   }
 
