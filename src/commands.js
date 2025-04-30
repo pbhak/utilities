@@ -54,7 +54,7 @@ async function join_ping_group({ ack, command, client }) {
   await ack();
 
   const existing_users = await client.usergroups.users.list({
-    usergroup: "S08QFM6MEJE",
+    usergroup: process.env.USER_GROUP,
   });
 
   if (existing_users.users.includes(command.user_id)) {
@@ -63,7 +63,7 @@ async function join_ping_group({ ack, command, client }) {
     );
 
     await client.usergroups.users.update({
-      usergroup: "S08QFM6MEJE",
+      usergroup: process.env.USER_GROUP,
       users: new_users,
     });
     await client.chat.postEphemeral({
@@ -75,7 +75,7 @@ async function join_ping_group({ ack, command, client }) {
     const new_users = [...existing_users.users, command.user_id];
 
     await client.usergroups.users.update({
-      usergroup: "S08QFM6MEJE",
+      usergroup: process.env.USER_GROUP,
       users: new_users,
     });
 
