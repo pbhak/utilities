@@ -18,7 +18,7 @@ import {
   addToPrivateChannel,
   welcomeInjection,
 } from "./views.js";
-import { sha256, shenanigans } from "./commands.js";
+import { join_ping_group, sha256, shenanigans } from "./commands.js";
 
 export { messages, sendMessage, getUserInfo };
 
@@ -78,6 +78,7 @@ bot.view("privateChannelViewSubmitted", addToPrivateChannel);
 // Slash commands
 bot.command("/shenanigans", shenanigans);
 bot.command("/sha256", sha256);
+bot.command("/yappery", join_ping_group);
 
 // Start bot and server
 (async () => {

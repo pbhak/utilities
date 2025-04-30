@@ -51,7 +51,7 @@ server.post("/info", (req, res) => {
   }
 
   const givenKeyHash = Buffer.from(
-    new CryptoHasher("sha256").update(req.get("X-Api-Key")).digest("hex")
+    new Bun.CryptoHasher("sha256").update(req.get("X-Api-Key")).digest("hex")
   );
 
   const keyHash = Buffer.from(process.env.API_KEY_HASH);
@@ -61,7 +61,7 @@ server.post("/info", (req, res) => {
     !crypto.timingSafeEqual(givenKeyHash, keyHash)
   ) {
     // because we don't want random people sending stats data, that could be bad
-    res.sendStatus(403); 
+    res.sendStatus(403);
     return;
   }
 
@@ -85,6 +85,7 @@ server.get("/online", async (req, res) => {
   res.set("Access-Control-Allow-Origin", "https://pbhak.dev");
   res.send(await getUserInfo());
 });
+
 
 export default function start_server() {
   server.listen(process.env.PORT, () => {

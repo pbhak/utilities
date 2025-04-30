@@ -20,6 +20,7 @@
   "dependencies": {
     "@slack/bolt": "^4.2.1",
     "body-parser": "^2.2.0",
+    "bun": "^1.2.11",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "js-yaml": "^4.1.0",

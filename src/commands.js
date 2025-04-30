@@ -1,5 +1,4 @@
-import { sha256 as sha256_hash } from "js-sha256";
-export { shenanigans, sha256 };
+export { shenanigans, sha256, join_ping_group };
 
 async function shenanigans({ ack, command, client }) {
   await ack();
@@ -36,10 +35,54 @@ async function shenanigans({ ack, command, client }) {
 async function sha256({ ack, command, client }) {
   await ack();
 
-  const hash = sha256_hash(command.text);
+  await client.conversations.setTopic({
+    channel: "C08MF2BHPK7",
+    topic: "test hehe",
+  });
+
+  const hash = new Bun.CryptoHasher("sha256")
+    .update(command.text)
+    .digest("hex");
   await client.chat.postEphemeral({
     channel: command.channel_id,
     user: command.user_id,
     text: `here's your requested hash! \`${hash}\``,
   });
+}
+
+async function join_ping_group({ ack, command, client }) {
+  await ack();
+
+  const existing_users = await client.usergroups.users.list({
+    usergroup: "S08QFM6MEJE",
+  });
+
+  if (existing_users.users.includes(command.user_id)) {
+    const new_users = existing_users.users.filter(
+      (user) => user !== command.user_id
+    );
+
+    await client.usergroups.users.update({
+      usergroup: "S08QFM6MEJE",
+      users: new_users,
+    });
+    await client.chat.postEphemeral({
+      channel: command.channel_id,
+      user: command.user_id,
+      text: "alright, i've removed you from my user group. have a good one!",
+    });
+  } else {
+    const new_users = [...existing_users.users, command.user_id];
+
+    await client.usergroups.users.update({
+      usergroup: "S08QFM6MEJE",
+      users: new_users,
+    });
+
+    await client.chat.postEphemeral({
+      channel: command.channel_id,
+      user: command.user_id,
+      text: "added you to the ping group - thanks for joining!",
+    });
+  }
 }
