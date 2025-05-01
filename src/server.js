@@ -20,6 +20,9 @@ const location_emoji = (country) =>
     ? messages.emojis.country.us
     : messages.emojis.country.other;
 
+const convertSecondsToMinutes = (secs) =>
+  `${Math.floor(secs / 60)}:${secs % 60}`;
+
 async function location_info(lat, lon) {
   const result = await geocoding.reverse({ lat, lon });
   return result.address;
@@ -35,6 +38,43 @@ async function info(battery, charging, lat, lon) {
     );
 
   sendMessage(info_message);
+}
+
+async function process_walk(walk_url) {
+  const workoutUrl = "https://api.mapmyfitness.com" + walk_url;
+  const workoutInfo = await fetch(workoutUrl, {
+    headers: {
+      Authorization: `Bearer ${process.env.MPF_BEARER_TOKEN}`,
+      "Api-Key": process.env.MPF_API_KEY,
+    },
+  }).then((response) => response.json().aggregates);
+
+  // Convert the distance (meters) to miles, then round it to 2 places
+  const distanceMiles =
+    Math.round((workoutInfo.distance_total / 1609) * 100) / 100;
+  const timeMinutes = convertSecondsToMinutes(workoutInfo.active_time_total);
+
+  const minsPerMile = convertSecondsToMinutes(
+    distanceMiles / workoutInfo.active_time_total
+  );
+  const minsPerKm = convertSecondsToMinutes(
+    workoutInfo.distance_total / 1000 / workoutInfo.active_time_total
+  );
+
+  const parentMessage = sendMessage(
+    messages.walk.completed
+      .replace("{distance}", distanceMiles)
+      .replace("{time}", timeMinutes)
+  );
+
+  sendMessage(
+    messages.walk.stats
+      .replace("{km}", Math.round((workoutInfo.distance_total * 10) / 100))
+      .replace("{steps}", workoutInfo.steps_total)
+      .replace("{min/mile}", minsPerMile)
+      .replace("{min/km}", minsPerKm),
+    { thread_ts: parentMessage.ts }
+  );
 }
 
 const server = express();
@@ -87,7 +127,7 @@ server.post("/info", (req, res) => {
 });
 
 server.post("/walk", (req, res) => {
-  console.log(req.body);
+  process_walk(req.body[0]._links.workout[0].href);
   res.sendStatus(202);
 });
 

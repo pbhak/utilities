@@ -42,3 +42,11 @@ private:
     sometimes you can catch me talking about life or just thinking about stuff.
     feel free to chat or hang out here, i don't mind :)
     have a good one!
+
+walk:
+  completed: walk completed! walked {distance} in {time}
+  stats: |
+    here's some more stats:
+    * total distance (km): {km}
+    * total steps: {steps}
+    * speed: {min/mile} min/mile ({min/km} min/km)

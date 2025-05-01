@@ -33,12 +33,15 @@ const CHANNEL = process.env.CHANNEL;
 // Read transcript YAML file
 const messages = yaml.load(readFileSync(process.env.YAML_FILE));
 
-async function sendMessage(text) {
+async function sendMessage(text, options = {}) {
   try {
-    await bot.client.chat.postMessage({
+    const message = await bot.client.chat.postMessage({
       channel: CHANNEL,
       text,
+      ...options,
     });
+
+    return message;
   } catch (error) {
     await bot.client.chat.postMessage({
       channel: CHANNEL,
