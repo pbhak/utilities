@@ -44,6 +44,11 @@ server.get("/", (req, res) => {
   res.redirect("https://github.com/pbhak/utilities");
 });
 
+server.get("/online", async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "https://pbhak.dev");
+  res.send(await getUserInfo());
+});
+
 server.post("/info", (req, res) => {
   if (!req.get("X-Api-Key")) {
     res.sendStatus(403);
@@ -51,7 +56,7 @@ server.post("/info", (req, res) => {
   }
 
   const givenKeyHash = Buffer.from(
-    new Bun.CryptoHasher("sha256").update(req.get("X-Api-Key")).digest("hex")
+    new CryptoHasher("sha256").update(req.get("X-Api-Key")).digest("hex")
   );
 
   const keyHash = Buffer.from(process.env.API_KEY_HASH);
@@ -81,11 +86,10 @@ server.post("/info", (req, res) => {
   res.sendStatus(200);
 });
 
-server.get("/online", async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "https://pbhak.dev");
-  res.send(await getUserInfo());
+server.post("/walk", (req, res) => {
+  console.log(req.body);
+  res.sendStatus(202);
 });
-
 
 export default function start_server() {
   server.listen(process.env.PORT, () => {
