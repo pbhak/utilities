@@ -47,7 +47,9 @@ async function process_walk(walk_url) {
       Authorization: `Bearer ${process.env.MPF_BEARER_TOKEN}`,
       "Api-Key": process.env.MPF_API_KEY,
     },
-  }).then((response) => response.json().aggregates);
+  })
+    .then(async (response) => await response.json())
+    .then((json) => json.aggregates);
 
   // Convert the distance (meters) to miles, then round it to 2 places
   const distanceMiles =
