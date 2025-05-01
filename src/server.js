@@ -20,8 +20,22 @@ const location_emoji = (country) =>
     ? messages.emojis.country.us
     : messages.emojis.country.other;
 
-const convertSecondsToMinutes = (secs) =>
-  `${Math.floor(secs / 60)}:${secs % 60}`;
+function convertSecondsToMinutes(secs) {
+  const finalMinutes = Math.floor(secs / 60);
+  const finalSeconds = (secs % 60).toString().padStart(2, "0");
+  
+  return `${finalMinutes}:${finalSeconds}`;
+}
+
+function minutesPerMile(meters, seconds) {
+  const miles = Math.round((meters / 1609) * 100) / 100;
+  return convertSecondsToMinutes(Math.round(seconds / miles));
+}
+
+function minutesPerKm(meters, seconds) {
+  const km = meters / 1000
+  return convertSecondsToMinutes(Math.round(seconds / km))
+}
 
 async function location_info(lat, lon) {
   const result = await geocoding.reverse({ lat, lon });
@@ -51,19 +65,19 @@ async function process_walk(walk_url) {
     .then(async (response) => await response.json())
     .then((json) => json.aggregates);
 
+  console.log(workoutInfo)
+
   // Convert the distance (meters) to miles, then round it to 2 places
   const distanceMiles =
     Math.round((workoutInfo.distance_total / 1609) * 100) / 100;
+  const distanceKm =
+    Math.round(workoutInfo.distance_total / 10) / 100
   const timeMinutes = convertSecondsToMinutes(workoutInfo.active_time_total);
 
-  const minsPerMile = convertSecondsToMinutes(
-    distanceMiles / workoutInfo.active_time_total
-  );
-  const minsPerKm = convertSecondsToMinutes(
-    workoutInfo.distance_total / 1000 / workoutInfo.active_time_total
-  );
-
-  const parentMessage = sendMessage(
+  const minsPerMile = minutesPerMile(workoutInfo.distance_total, workoutInfo.active_time_total);
+  const minsPerKm = minutesPerKm(workoutInfo.distance_total, workoutInfo.active_time_total);
+  
+  const parentMessage = await sendMessage(
     messages.walk.completed
       .replace("{distance}", distanceMiles)
       .replace("{time}", timeMinutes)
@@ -71,7 +85,7 @@ async function process_walk(walk_url) {
 
   sendMessage(
     messages.walk.stats
-      .replace("{km}", Math.round((workoutInfo.distance_total * 10) / 100))
+      .replace("{km}", distanceKm)
       .replace("{steps}", workoutInfo.steps_total)
       .replace("{min/mile}", minsPerMile)
       .replace("{min/km}", minsPerKm),
@@ -129,6 +143,7 @@ server.post("/info", (req, res) => {
 });
 
 server.post("/walk", (req, res) => {
+  console.log(req.body)
   process_walk(req.body[0]._links.workout[0].href);
   res.sendStatus(202);
 });

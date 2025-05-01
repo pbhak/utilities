@@ -44,9 +44,9 @@ private:
     have a good one!
 
 walk:
-  completed: walk completed! walked {distance} in {time}
+  completed: walk completed! walked {distance} miles in {time}
   stats: |
     here's some more stats:
-    * total distance (km): {km}
-    * total steps: {steps}
-    * speed: {min/mile} min/mile ({min/km} min/km)
+    • total distance (km): {km}
+    • total steps: {steps}
+    • speed: {min/mile} min/mi ({min/km} min/km)

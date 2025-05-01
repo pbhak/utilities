@@ -37,7 +37,15 @@ async function sendMessage(text, options = {}) {
   try {
     const message = await bot.client.chat.postMessage({
       channel: CHANNEL,
-      text,
+      blocks: [
+	{
+          type: "section",
+	  text: {
+	    type: "mrkdwn",
+	    text	
+	  }
+	}
+      ], 
       ...options,
     });
 
