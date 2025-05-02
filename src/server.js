@@ -23,7 +23,7 @@ const location_emoji = (country) =>
 function convertSecondsToMinutes(secs) {
   const finalMinutes = Math.floor(secs / 60);
   const finalSeconds = (secs % 60).toString().padStart(2, "0");
-  
+
   return `${finalMinutes}:${finalSeconds}`;
 }
 
@@ -33,8 +33,8 @@ function minutesPerMile(meters, seconds) {
 }
 
 function minutesPerKm(meters, seconds) {
-  const km = meters / 1000
-  return convertSecondsToMinutes(Math.round(seconds / km))
+  const km = meters / 1000;
+  return convertSecondsToMinutes(Math.round(seconds / km));
 }
 
 async function location_info(lat, lon) {
@@ -65,18 +65,21 @@ async function process_walk(walk_url) {
     .then(async (response) => await response.json())
     .then((json) => json.aggregates);
 
-  console.log(workoutInfo)
-
   // Convert the distance (meters) to miles, then round it to 2 places
   const distanceMiles =
     Math.round((workoutInfo.distance_total / 1609) * 100) / 100;
-  const distanceKm =
-    Math.round(workoutInfo.distance_total / 10) / 100
+  const distanceKm = Math.round(workoutInfo.distance_total / 10) / 100;
   const timeMinutes = convertSecondsToMinutes(workoutInfo.active_time_total);
 
-  const minsPerMile = minutesPerMile(workoutInfo.distance_total, workoutInfo.active_time_total);
-  const minsPerKm = minutesPerKm(workoutInfo.distance_total, workoutInfo.active_time_total);
-  
+  const minsPerMile = minutesPerMile(
+    workoutInfo.distance_total,
+    workoutInfo.active_time_total
+  );
+  const minsPerKm = minutesPerKm(
+    workoutInfo.distance_total,
+    workoutInfo.active_time_total
+  );
+
   const parentMessage = await sendMessage(
     messages.walk.completed
       .replace("{distance}", distanceMiles)
@@ -86,7 +89,7 @@ async function process_walk(walk_url) {
   sendMessage(
     messages.walk.stats
       .replace("{km}", distanceKm)
-      .replace("{steps}", workoutInfo.steps_total)
+      .replace("{steps}", workoutInfo.steps_total.toLocaleString("en-US"))
       .replace("{min/mile}", minsPerMile)
       .replace("{min/km}", minsPerKm),
     { thread_ts: parentMessage.ts }
@@ -112,7 +115,7 @@ server.post("/info", (req, res) => {
   }
 
   const givenKeyHash = Buffer.from(
-    new CryptoHasher("sha256").update(req.get("X-Api-Key")).digest("hex")
+    new Bun.CryptoHasher("sha256").update(req.get("X-Api-Key")).digest("hex")
   );
 
   const keyHash = Buffer.from(process.env.API_KEY_HASH);
@@ -143,7 +146,6 @@ server.post("/info", (req, res) => {
 });
 
 server.post("/walk", (req, res) => {
-  console.log(req.body)
   process_walk(req.body[0]._links.workout[0].href);
   res.sendStatus(202);
 });
