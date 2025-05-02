@@ -101,7 +101,7 @@ bot.view("privateChannelViewSubmitted", addToPrivateChannel);
 bot.command("/shenanigans", shenanigans);
 bot.command("/sha256", sha256);
 bot.command("/yappery", join_ping_group);
-bot.command("/id", get_id);
+bot.command("/get-id", get_id);
 
 // Start bot and server
 (async () => {
