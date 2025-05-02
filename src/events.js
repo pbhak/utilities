@@ -150,6 +150,8 @@ async function home_opened({ client, event }) {
 }
 
 async function check_node_status() {
+  let nodes_offline = false;
+
   const exclude_nodes = ["zenbook"];
   const tailscale_nodes = await fetch(
     "https://api.tailscale.com/api/v2/tailnet/pbhak.github/devices",
@@ -170,6 +172,14 @@ async function check_node_status() {
       !dateWithinOneHour(new Date(node.lastSeen)) // Exclude nodes that have been seen within the hour
     ) {
       // Node offline
+      nodes_offline = true;
+
+      sendMessage(
+        `<@U07V1ND4H0Q> node \`${nodeName}\` is offline! (last seen ${new Date(
+          node.lastSeen
+        ).toLocaleTimeString("en-US", { timeZone: "America/Los_Angeles" })})`
+      );
+
       sendLog(
         `<@U07V1ND4H0Q> node \`${nodeName}\` is offline! (last seen ${new Date(
           node.lastSeen
@@ -177,4 +187,6 @@ async function check_node_status() {
       );
     }
   });
+
+  if (!nodes_offline) sendLog("all nodes online");
 }
