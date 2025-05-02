@@ -1,3 +1,5 @@
+import { sendLog } from "./index.js";
+
 export { shenanigans, sha256, join_ping_group, get_id };
 
 async function shenanigans({ ack, command, client }) {
@@ -94,6 +96,12 @@ async function get_id({ ack, command, client }) {
   let finalMessage = "here's your requested IDs! \n";
   // Get all given mentions and use RegEx to map each mention into an array for looping
   const mentions = [...command.text.matchAll(/<[^>]+>/g)].map((exp) => exp[0]);
+
+  if (mentions.length === 0) {
+    // If no input was provided, give the command user and command channel as default
+    ids[`@${command.user_name}`] = command.user_id;
+    ids[`#${command.channel_name}`] = command.channel_id;
+  }
 
   mentions.forEach((mention) => {
     if (mention.startsWith("<@") || mention.startsWith("<#")) {
