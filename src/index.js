@@ -18,9 +18,9 @@ import {
   addToPrivateChannel,
   welcomeInjection,
 } from "./views.js";
-import { join_ping_group, sha256, shenanigans } from "./commands.js";
+import { get_id, join_ping_group, sha256, shenanigans } from "./commands.js";
 
-export { messages, sendMessage, getUserInfo };
+export { messages, sendMessage, sendLog, getUserInfo };
 
 const bot = new Bolt.App({
   token: process.env.ACCESS_TOKEN,
@@ -28,7 +28,7 @@ const bot = new Bolt.App({
   socketMode: true,
 });
 
-const CHANNEL = process.env.CHANNEL;
+const CHANNEL = process.env.MAIN_CHANNEL;
 
 // Read transcript YAML file
 const messages = yaml.load(readFileSync(process.env.YAML_FILE));
@@ -38,14 +38,14 @@ async function sendMessage(text, options = {}) {
     const message = await bot.client.chat.postMessage({
       channel: CHANNEL,
       blocks: [
-	{
+        {
           type: "section",
-	  text: {
-	    type: "mrkdwn",
-	    text	
-	  }
-	}
-      ], 
+          text: {
+            type: "mrkdwn",
+            text,
+          },
+        },
+      ],
       ...options,
     });
 
@@ -57,6 +57,13 @@ async function sendMessage(text, options = {}) {
     });
     console.error(error);
   }
+}
+
+async function sendLog(text, debug = false) {
+  await bot.client.chat.postMessage({
+    channel: process.env.LOG_CHANNEL,
+    text: `${debug ? "debug: " : ""}${text}`,
+  });
 }
 
 async function getUserInfo() {
@@ -90,11 +97,13 @@ bot.view("privateChannelViewSubmitted", addToPrivateChannel);
 bot.command("/shenanigans", shenanigans);
 bot.command("/sha256", sha256);
 bot.command("/yappery", join_ping_group);
+bot.command("/id", get_id);
 
 // Start bot and server
 (async () => {
   await bot.start();
   console.log(messages.startup.bot);
+  sendLog(messages.startup.bot);
 })();
 
 start_server();

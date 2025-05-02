@@ -1,7 +1,7 @@
 import bodyParser from "body-parser";
 import express from "express";
 import nominatim from "nominatim-client";
-import { sendMessage, messages, getUserInfo } from "./index.js";
+import { sendMessage, messages, getUserInfo, sendLog } from "./index.js";
 
 // Geocoding API
 const geocoding = nominatim.createClient({
@@ -55,6 +55,8 @@ async function info(battery, charging, lat, lon) {
 }
 
 async function process_walk(walk_url) {
+  sendLog('walk data received on /walk')
+
   const workoutUrl = "https://api.mapmyfitness.com" + walk_url;
   const workoutInfo = await fetch(workoutUrl, {
     headers: {
@@ -109,7 +111,10 @@ server.get("/online", async (req, res) => {
 });
 
 server.post("/info", (req, res) => {
+  sendLog('battery and location data received on /info')
+
   if (!req.get("X-Api-Key")) {
+    sendLog('request errored with HTTP 403 - api key not given')
     res.sendStatus(403);
     return;
   }
@@ -125,6 +130,7 @@ server.post("/info", (req, res) => {
     !crypto.timingSafeEqual(givenKeyHash, keyHash)
   ) {
     // because we don't want random people sending stats data, that could be bad
+    sendLog('request errored with HTTP 403 - api key incorrect')
     res.sendStatus(403);
     return;
   }
@@ -137,6 +143,7 @@ server.post("/info", (req, res) => {
     req.body.lon == undefined ||
     req.body.charging == undefined
   ) {
+    sendLog('request errored with HTTP 400 - data not properly formatted')
     res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
     return;
   }
@@ -153,5 +160,6 @@ server.post("/walk", (req, res) => {
 export default function start_server() {
   server.listen(process.env.PORT, () => {
     console.log(messages.startup.server.replace("{port}", process.env.PORT));
+    sendLog(messages.startup.server.replace("{port}", process.env.PORT));
   });
 }
