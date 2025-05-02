@@ -1,6 +1,8 @@
-import { messages } from "./index.js";
+import { messages, sendLog, sendMessage } from "./index.js";
 
-export { member_join, app_mention, home_opened };
+export { member_join, app_mention, home_opened, check_node_status };
+
+const dateWithinOneHour = (date) => date > Date.now() - 60 * 60 * 1000;
 
 async function member_join({ event, body, client }) {
   if (event.channel == "C08MNCVRJN8")
@@ -145,4 +147,34 @@ async function home_opened({ client, event }) {
       },
     });
   }
+}
+
+async function check_node_status() {
+  const exclude_nodes = ["zenbook"];
+  const tailscale_nodes = await fetch(
+    "https://api.tailscale.com/api/v2/tailnet/pbhak.github/devices",
+    {
+      headers: { Authorization: `Bearer ${process.env.TAILSCALE_API_KEY}` },
+    }
+  )
+    .then(async (response) => await response.json())
+    .then((json) => json.devices);
+
+  tailscale_nodes.forEach((node) => {
+    const nodeName = node.name.split(".")[0];
+
+    if (
+      !exclude_nodes.includes(nodeName) && // Exclude nodes in the exclude list
+      !nodeName.startsWith("tailscale-ssh-console") && // Exclude SSH ephemeral nodes
+      !node.isExternal && // Exclude nodes I don't know
+      !dateWithinOneHour(new Date(node.lastSeen)) // Exclude nodes that have been seen within the hour
+    ) {
+      // Node offline
+      sendLog(
+        `<@U07V1ND4H0Q> node \`${nodeName}\` is offline! (last seen ${new Date(
+          node.lastSeen
+        ).toLocaleTimeString("en-US", { timeZone: "America/Los_Angeles" })})`
+      );
+    }
+  });
 }

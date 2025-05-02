@@ -1,6 +1,11 @@
 import Bolt from "@slack/bolt";
 import { readFileSync } from "node:fs";
-import { member_join, app_mention, home_opened } from "./events.js";
+import {
+  member_join,
+  app_mention,
+  home_opened,
+  check_node_status,
+} from "./events.js";
 import start_server from "./server.js";
 import yaml from "js-yaml";
 import {
@@ -19,6 +24,7 @@ import {
   welcomeInjection,
 } from "./views.js";
 import { get_id, join_ping_group, sha256, shenanigans } from "./commands.js";
+import { CronJob } from "cron";
 
 export { messages, sendMessage, sendLog, getUserInfo };
 
@@ -76,6 +82,9 @@ async function getUserInfo() {
   });
   return status.presence == "active";
 }
+
+// Cronjob for Tailscale node status
+new CronJob("0 * * * *", check_node_status, null, true, "America/Los_Angeles");
 
 // Events
 bot.event("member_joined_channel", member_join);
