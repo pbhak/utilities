@@ -23,7 +23,7 @@ import { get_id, join_ping_group, sha256, shenanigans } from "./commands.js";
 export { messages, sendMessage, sendLog, getUserInfo };
 
 process.on("uncaughtException", (err) => {
-  sendLog(`an uncaught exception has occurred: \n ${err}`);
+  sendLog(`an uncaught exception has occurred: \n\`\`\`${err}\`\`\``);
 });
 
 const bot = new Bolt.App({
