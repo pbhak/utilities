@@ -74,7 +74,7 @@ async function dontSendWelcomeMessage({ ack, body, client, respond }) {
   });
 }
 
-async function doNothing({ ack }) {
+export async function doNothing({ ack }) {
   await ack();
 }
 
