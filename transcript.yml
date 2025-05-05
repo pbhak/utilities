@@ -8,7 +8,6 @@ welcome:
   question: do you want to be publicly welcomed?
   public: welcome to my channel {user}!
   private: alright, no problem boss!
-  private_dm: user {user} has joined the channel!
 
 error: An error has occurred - see console for more information
 
@@ -16,8 +15,6 @@ stats: |
   *daily stats:*
   phone battery: {battery}
   location: {location}
-
-root: hi! you've reached the root endpoint on my info api. maybe check your request uri? - pbhak :)
 
 startup:
   bot: 'bot: started!'
@@ -36,7 +33,6 @@ private:
     hi! if you're seeing this, you're a pretty cool person :)
     i've invited you to join my private channel, #parneel-reflects. 
     you can join if you want, but if you don't want to, it's no problem!
-  invite_edit: channel joined :)
   welcome: |
     hi, welcome to my private channel! thanks for being an amazing person, it means a lot :D
     sometimes you can catch me talking about life or just thinking about stuff.
@@ -50,3 +46,7 @@ walk:
     • total distance (km): {km}
     • total steps: {steps}
     • speed: {min/mile} min/mi ({min/km} min/km)
+
+usergroup:
+  join: added you to the ping group - thanks for joining!
+  leave: alright, removed you from my user group. have a good one!
