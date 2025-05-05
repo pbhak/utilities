@@ -11,7 +11,6 @@ interface MessageMetadata {
   ts: string;
   cid: string;
   uid: string;
-  doNotWelcome: boolean;
 }
 
 export async function openMessageView({
@@ -21,8 +20,6 @@ export async function openMessageView({
   context,
 }: SlackActionMiddlewareArgs<BlockAction> & AllMiddlewareArgs): Promise<void> {
   await ack();
-  const doNotWelcome = body.actions[0]?.action_id == 'replyAgain';
-
   await client.views.open({
     trigger_id: body.trigger_id,
     view: {
@@ -32,7 +29,6 @@ export async function openMessageView({
         ts: body.message?.ts,
         cid: body.container.channel_id,
         uid: body.user.id,
-        doNotWelcome: doNotWelcome,
       }),
       title: {
         type: 'plain_text',
@@ -75,15 +71,13 @@ export async function handleMessageSubmission({
 
   const metadata: MessageMetadata = JSON.parse(payload.private_metadata);
 
-  if (!metadata.doNotWelcome) {
-    // Since doNotWelcome was false, we know the user got here from a welcome message
-    // Update the welcome message to remove the "send message" button
-    await client.chat.update({
-      channel: metadata.cid,
-      ts: metadata.ts,
-      text: transcript.welcome.public.replace('{user}', `<@${body.user.id}>`),
-    });
-  }
+  // Since doNotWelcome was false, we know the user got here from a welcome message
+  // Update the welcome message to remove the "send message" button
+  await client.chat.update({
+    channel: metadata.cid,
+    ts: metadata.ts,
+    text: transcript.welcome.public.replace('{user}', `<@${body.user.id}>`),
+  });
 
   await client.chat.postEphemeral({
     channel: metadata.cid,

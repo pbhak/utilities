@@ -29,14 +29,15 @@ function withinOneHour(date: Date): boolean {
 }
 
 export async function checkNodeStatus() {
-  let offlineNodes = [];
+  let offlineNodes: TailscaleNodes[] = [];
   const nodesToExclude = ['zenbook', 'hermando'];
 
   const tailscaleResponse = await fetch(
     'https://api.tailscale.com/api/v2/tailnet/pbhak.github/devices',
     { headers: { Authorization: `Bearer ${process.env.TAILSCALE_API_KEY}` } }
-  )
-  const tailscaleNodes = ((await tailscaleResponse.json()) as { devices: TailscaleNodes[] }).devices
+  );
+  const tailscaleNodes = ((await tailscaleResponse.json()) as { devices: TailscaleNodes[] })
+    .devices;
 
   tailscaleNodes.forEach(async (node) => {
     const nodeName = node.name.split('.')[0];
@@ -51,31 +52,31 @@ export async function checkNodeStatus() {
       // Node offline
       offlineNodes.push(node);
     }
-
-    if (offlineNodes.length === 0) {
-      sendLog('all nodes online', 'tailscale');
-      return;
-    } else {
-      const nodeOfflineMessageTimestamp = (
-        await sendLog('offline node(s) detected', 'tailscale')
-      ).ts;
-
-      offlineNodes.forEach((offlineNode) => {
-        const offlineNodeName = offlineNode.name.split('.')[0];
-
-        sendLog(
-          `node \`${offlineNodeName}\` is offline!`,
-          'tailscale',
-          nodeOfflineMessageTimestamp
-        );
-
-        app.client.chat.postMessage({
-          channel: process.env.MAIN_CHANNEL,
-          text: `<@U07V1ND4H0Q> node \`${offlineNodeName}\` is offline! (last seen ${new Date(
-            offlineNode.lastSeen
-          ).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles' })})`,
-        });
-      });
-    }
   });
+
+  if (offlineNodes.length === 0) {
+    sendLog('all nodes online', 'tailscale');
+    return;
+  } else {
+    const nodeOfflineMessageTimestamp = (
+      await sendLog('offline node(s) detected', 'tailscale')
+    ).ts;
+
+    offlineNodes.forEach((offlineNode) => {
+      const offlineNodeName = offlineNode.name.split('.')[0];
+
+      sendLog(
+        `node \`${offlineNodeName}\` is offline!`,
+        'tailscale',
+        nodeOfflineMessageTimestamp
+      );
+
+      app.client.chat.postMessage({
+        channel: process.env.MAIN_CHANNEL,
+        text: `<@U07V1ND4H0Q> node \`${offlineNodeName}\` is offline! (last seen ${new Date(
+          offlineNode.lastSeen
+        ).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles' })})`,
+      });
+    });
+  }
 }

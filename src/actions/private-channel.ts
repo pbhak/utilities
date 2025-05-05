@@ -66,6 +66,7 @@ export async function openPrivateChannelView({
           },
           accessory: {
             type: 'multi_users_select',
+            action_id: 'users',
           },
         },
       ],

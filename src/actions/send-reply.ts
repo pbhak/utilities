@@ -22,6 +22,8 @@ export async function openReplyView({
 
   if (!body.message || !body.message.text) return;
 
+  console.log(body.message.text)
+
   await client.views.open({
     trigger_id: body.trigger_id,
     view: {
@@ -31,7 +33,7 @@ export async function openReplyView({
         ts: body.message?.ts,
         cid: body.container.channel_id,
         uid: body.message.text.match(/<@(\w+)>/)![1],
-        message: body.message.text.match(/(?<=said: ).*/)![0],
+        message: body.message.text.match(/(?<=replied:\s)(.*?)(?=\sreply button$)/)![0],
       }),
       title: {
         type: 'plain_text',
