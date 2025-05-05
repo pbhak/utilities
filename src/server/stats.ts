@@ -23,19 +23,20 @@ function locationEmoji(country: string) {
 }
 
 async function formatStats(battery: number, charging: boolean, lat: number, lon: number) {
-  const location = await geocoding.reverse({ lat, lon }).then((location) => location.address);
+  const locationInfo = (await geocoding.reverse({ lat, lon })).address;
+
   return transcript.stats
     .replace('{battery}', `${battery}% ${batteryEmoji(battery, charging)}`)
     .replace(
       '{location}',
-      `${location.city}, ${location.state}  ${locationEmoji(location.country)}`
+      `${locationInfo.city}, ${locationInfo.state}  ${locationEmoji(locationInfo.country)}`
     );
 }
 
 export default async function info(req: Request, res: Response) {
   const apiKey = req.get('X-Api-Key');
   if (!apiKey) {
-    sendLog('invalid request made to /info - no api key provided');
+    sendLog('invalid request made to /info - no api key provided', 'stats');
     res.sendStatus(403);
     return;
   }
@@ -49,7 +50,7 @@ export default async function info(req: Request, res: Response) {
     givenKeyHash.length !== actualHash.length ||
     !crypto.timingSafeEqual(givenKeyHash, actualHash)
   ) {
-    sendLog('invalid request made to /info - invalid api key');
+    sendLog('invalid request made to /info - invalid api key', 'stats');
     res.sendStatus(403);
     return;
   }
@@ -62,12 +63,12 @@ export default async function info(req: Request, res: Response) {
     req.body.lon == undefined ||
     req.body.charging == undefined
   ) {
-    sendLog('invalid request made to /info - invalid request body');
+    sendLog('invalid request made to /info - invalid request body', 'stats');
     res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
     return;
   }
 
-  sendLog('battery and location data received on /info');
+  sendLog('battery and location data received on /info', 'stats');
   app.client.chat.postMessage({
     channel: process.env.MAIN_CHANNEL,
     text: await formatStats(

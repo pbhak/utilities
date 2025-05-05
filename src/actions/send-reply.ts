@@ -25,7 +25,7 @@ export async function openReplyView({
   await client.views.open({
     trigger_id: body.trigger_id,
     view: {
-      callback_id: 'replyViewSubmitted', // FIXME
+      callback_id: 'replyViewSubmitted',
       type: 'modal',
       private_metadata: JSON.stringify({
         ts: body.message?.ts,
@@ -97,7 +97,7 @@ export async function handleReplySubmission({
               type: 'plain_text',
               text: 'reply',
             },
-            action_id: 'replyAgain', // FIXME
+            action_id: 'replyAgain',
           },
         ],
       },

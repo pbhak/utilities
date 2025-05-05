@@ -14,16 +14,6 @@ interface MessageMetadata {
   doNotWelcome: boolean;
 }
 
-// TODO add jsdoc comments instead of long normal ones
-
-export async function welcomeInjection({ context, next }: AllMiddlewareArgs): Promise<void> {
-  // When the user replies to a message through their DMs with the bot, and not through
-  // the welcome message, this middleware is passed through to make doNotWelcome true,
-  // so that the bot doesn't try to edit out a send message button from a nonexistent welcome message.
-  context.doNotWelcome = true;
-  await next();
-}
-
 export async function openMessageView({
   ack,
   body,
@@ -31,6 +21,7 @@ export async function openMessageView({
   context,
 }: SlackActionMiddlewareArgs<BlockAction> & AllMiddlewareArgs): Promise<void> {
   await ack();
+  const doNotWelcome = body.actions[0]?.action_id == 'replyAgain';
 
   await client.views.open({
     trigger_id: body.trigger_id,
@@ -41,7 +32,7 @@ export async function openMessageView({
         ts: body.message?.ts,
         cid: body.container.channel_id,
         uid: body.user.id,
-        doNotWelcome: context.doNotWelcome,
+        doNotWelcome: doNotWelcome,
       }),
       title: {
         type: 'plain_text',
@@ -120,7 +111,7 @@ export async function handleMessageSubmission({
               type: 'plain_text',
               text: 'reply',
             },
-            action_id: 'replyClicked', // FIXME
+            action_id: 'replyClicked',
           },
         ],
       },

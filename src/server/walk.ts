@@ -1,5 +1,5 @@
 import { app, sendLog, transcript } from '..';
-import type { Walk } from '../../types/walk';
+import type { Walk } from '../types/walk';
 
 function convertSecondsToMinutes(secs: number) {
   const finalMinutes = Math.floor(secs / 60);
@@ -19,17 +19,16 @@ function minutesPerKm(meters: number, seconds: number) {
 }
 
 export default async function processWalk(walkUrl: string) {
-  sendLog('walk data received on /walk');
+  sendLog('walk data received on /walk', 'walk');
 
   const workoutUrl = 'https://api.mapmyfitness.com' + walkUrl;
-  const workoutInfo = await fetch(workoutUrl, {
+  const workoutResponse = await fetch(workoutUrl, {
     headers: {
       Authorization: `Bearer ${process.env.MPF_BEARER_TOKEN}`,
       'Api-Key': process.env.MPF_API_KEY,
     },
   })
-    .then(async (response) => await response.json())
-    .then((json) => (json as Walk).aggregates);
+  const workoutInfo = (await workoutResponse.json() as Walk).aggregates
 
   // Convert the distance (meters) to miles, then round it to 2 places
   const distanceMiles = Math.round((workoutInfo.distance_total / 1609) * 100) / 100;

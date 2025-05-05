@@ -7,9 +7,9 @@ export async function memberJoin({
   event,
 }: SlackEventMiddlewareArgs<'member_joined_channel'> & AllMiddlewareArgs): Promise<void> {
   if (event.channel === process.env.PRIVATE_CHANNEL) memberJoinPrivate({ client, event });
-  const isBot = await client.users
-    .info({ user: event.user })
-    .then((response) => response.user?.is_bot);
+
+  const userInfo = await client.users.info({ user: event.user });
+  const isBot = userInfo.user?.is_bot;
 
   if (event.channel !== process.env.MAIN_CHANNEL || isBot) return;
 
@@ -17,16 +17,14 @@ export async function memberJoin({
   await client.chat.postEphemeral({
     channel: event.channel,
     text: transcript.welcome.initial,
-    user: event.user ?? (event as any)?.message?.user, // to account for edited messages
+    user: event.user,
   });
 
   // Check the amount of people in the channel, and send a celebratory message if it's a multiple of 10
-  const numMembers = await client.conversations
-    .info({
-      channel: event.channel,
-      include_num_members: true,
-    })
-    .then((info) => info.channel?.num_members);
+  const numMembers = (await client.conversations.info({
+    channel: event.channel,
+    include_num_members: true,
+  })).channel?.num_members;
 
   if (numMembers && numMembers % 10 == 0) {
     await client.chat.postMessage({
@@ -56,7 +54,7 @@ export async function memberJoin({
               text: 'sure!',
             },
             style: 'primary',
-            action_id: 'showWelcomeMessage', // FIXME
+            action_id: 'showWelcomeMessage',
           },
           {
             type: 'button',
@@ -65,12 +63,12 @@ export async function memberJoin({
               text: 'nah',
             },
             style: 'danger',
-            action_id: 'dontShowWelcomeMessage', // FIXME
+            action_id: 'dontShowWelcomeMessage',
           },
         ],
       },
     ],
-    user: event.user ?? (event as any).message.user,
+    user: event.user,
   });
 }
 

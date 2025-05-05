@@ -5,18 +5,17 @@ export async function appMention({
   event,
 }: SlackEventMiddlewareArgs<'app_mention'> & AllMiddlewareArgs): Promise<void> {
   const includesWave = event.text.includes(':hyper-dino-wave:');
-  const messageReactions = await client.reactions
-    .get({
-      channel: event.channel,
-      timestamp: event.ts,
-    })
-    .then((response) => response.message?.reactions)
-    .then((reactions) => reactions?.map((reaction) => reaction.name));
+  const messageReactions = await client.reactions.get({
+    channel: event.channel,
+    timestamp: event.ts,
+  });
+
+  const messageReactionNames = messageReactions.message?.reactions?.map((reaction) => reaction.name)
 
   if (
     !(
-      messageReactions?.includes('hyper-dino-wave') ||
-      messageReactions?.includes('hyper-dino-wave-flip')
+      messageReactionNames?.includes('hyper-dino-wave') ||
+      messageReactionNames?.includes('hyper-dino-wave-flip')
     )
   ) {
     await client.reactions.add({

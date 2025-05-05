@@ -27,7 +27,7 @@ export async function homeOpened({
                 type: 'plain_text',
                 text: 'add person to private channel',
               },
-              action_id: 'privateChannelAdd', // FIXME
+              action_id: 'privateChannelAdd',
             },
           ],
         },

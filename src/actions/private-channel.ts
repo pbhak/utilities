@@ -6,7 +6,6 @@ import type {
   ViewSubmitAction,
 } from '@slack/bolt';
 import { transcript } from '..';
-import { pathToFileURL } from 'url';
 
 export async function joinPrivateChannel({
   ack,
@@ -15,14 +14,16 @@ export async function joinPrivateChannel({
 }: SlackActionMiddlewareArgs<BlockAction> & AllMiddlewareArgs): Promise<void> {
   await ack();
 
+  if (!body.channel || !body.message) return;
+
   await client.conversations.invite({
     channel: process.env.PRIVATE_CHANNEL,
     users: body.user.id,
   });
 
   await client.chat.update({
-    channel: body.channel?.id as string,
-    ts: body.message?.ts as string,
+    channel: body.channel?.id,
+    ts: body.message?.ts,
     blocks: [
       {
         type: 'section',
@@ -45,7 +46,7 @@ export async function openPrivateChannelView({
   await client.views.open({
     trigger_id: body.trigger_id,
     view: {
-      callback_id: 'privateChannelViewSubmitted', // FIXME
+      callback_id: 'privateChannelViewSubmitted',
       type: 'modal',
       title: {
         type: 'plain_text',
@@ -58,14 +59,13 @@ export async function openPrivateChannelView({
       blocks: [
         {
           type: 'section',
-          block_id: 'usersToAdd', // FIXME
+          block_id: 'usersToAdd',
           text: {
             type: 'mrkdwn',
             text: '*user(s) to add:*',
           },
           accessory: {
             type: 'multi_users_select',
-            action_id: 'users', // FIXME
           },
         },
       ],
@@ -102,7 +102,7 @@ export async function addToPrivateChannel({
                 text: 'join',
               },
               style: 'primary',
-              action_id: 'join_private_channel', // FIXME
+              action_id: 'joinPrivateChannel',
             },
           ],
         },

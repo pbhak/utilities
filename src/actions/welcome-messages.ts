@@ -8,13 +8,13 @@ export async function sendWelcomeMessage({
   respond,
 }: SlackActionMiddlewareArgs & AllMiddlewareArgs): Promise<void> {
   await ack();
-  if (!body.channel) return; // in case the action is triggered from a modal
+  if (!body.channel || !body.channel.id) return; // in case the action is triggered from a modal
 
   await respond({ delete_original: true });
 
   const welcomeMessage = transcript.welcome.public.replace('{user}', `<@${body.user.id}>`);
   await client.chat.postMessage({
-    channel: body.channel.id as string,
+    channel: body.channel.id,
     text: welcomeMessage,
     blocks: [
       {
@@ -33,7 +33,7 @@ export async function sendWelcomeMessage({
               type: 'plain_text',
               text: 'send message',
             },
-            action_id: 'sendMessage', // FIXME
+            action_id: 'sendMessage',
           },
         ],
       },
@@ -49,10 +49,10 @@ export async function dontSendWelcomeMessage({
 }: SlackActionMiddlewareArgs & AllMiddlewareArgs): Promise<void> {
   await ack();
 
-  if (!body.channel) return; // in case the action is triggered from a modal
+  if (!body.channel || !body.channel.id) return; // in case the action is triggered from a modal
 
   await client.chat.postEphemeral({
-    channel: body.channel.id as string,
+    channel: body.channel.id,
     text: transcript.welcome.private,
     user: body.user.id,
   });
