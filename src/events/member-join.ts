@@ -20,6 +20,13 @@ export async function memberJoin({
     user: event.user,
   });
 
+  // Notify me :3
+  await client.chat.postEphemeral({
+    channel: event.channel,
+    text: `user <@${event.user}> has joined! :yay:`,
+    user: process.env.USER_ID
+  })
+
   // Check the amount of people in the channel, and send a celebratory message if it's a multiple of 10
   const numMembers = (await client.conversations.info({
     channel: event.channel,
