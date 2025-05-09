@@ -44,7 +44,7 @@ export async function sendLog(
   origin?: string,
   thread_ts?: string
 ): Promise<ChatPostMessageResponse> {
-  const messageText = (origin ? `${origin}: ` : `'log: `) + text;
+  const messageText = (origin ? `${origin}: ` : `log: `) + text;
   return await app.client.chat.postMessage({
     channel: process.env.LOG_CHANNEL,
     text: messageText,
