@@ -57,5 +57,11 @@ export async function dontSendWelcomeMessage({
     user: body.user.id,
   });
 
+  await client.chat.postEphemeral({
+    channel: body.channel.id,
+    text: `user <@${body.user.id}> has joined! :yay:`,
+    user: process.env.USER_ID
+  })
+
   await respond({ delete_original: true });
 }

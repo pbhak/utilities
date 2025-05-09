@@ -55,7 +55,6 @@ export async function checkNodeStatus() {
   });
 
   if (offlineNodes.length === 0) {
-    sendLog('all nodes online', 'tailscale');
     return;
   } else {
     const nodeOfflineMessageTimestamp = (
