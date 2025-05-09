@@ -90,7 +90,7 @@ app.command('/get-id', getId);
 (async () => {
   await app.start();
   console.log(transcript.startup.bot);
-  sendLog(transcript.startup.bot, 'app');
+  sendLog(transcript.startup.bot, 'bot');
 })();
 
 startServer();

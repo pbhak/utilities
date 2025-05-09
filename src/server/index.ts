@@ -30,6 +30,6 @@ export default function startServer() {
   server.listen(process.env.PORT, () => {
     const startup = transcript.startup.server.replace('{port}', process.env.PORT.toString());
     console.log(startup);
-    sendLog(startup);
+    sendLog(startup, 'server');
   });
 }

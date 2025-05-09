@@ -17,13 +17,13 @@ stats: |
   location: {location}
 
 startup:
-  bot: 'bot: started!'
-  server: 'server: started on port {port}'
+  bot: started!
+  server: started on port {port}
 
 emojis:
   battery:
-    low: ':low_battery:'
-    normal: ':battery:'
+    low: :low_battery:
+    normal: :battery:
   country:
     us: ':us:'
     other: ':globe_with_meridians:'
