@@ -22,8 +22,8 @@ startup:
 
 emojis:
   battery:
-    low: :low_battery:
-    normal: :battery:
+    low: ':low_battery:'
+    normal: ':battery:'
   country:
     us: ':us:'
     other: ':globe_with_meridians:'
