@@ -65,13 +65,11 @@ export async function handleMessageSubmission({
   body,
   client,
   payload,
-  respond,
 }: SlackViewMiddlewareArgs<ViewSubmitAction> & AllMiddlewareArgs): Promise<void> {
   await ack({ response_action: 'clear' });
 
   const metadata: MessageMetadata = JSON.parse(payload.private_metadata);
 
-  // Since doNotWelcome was false, we know the user got here from a welcome message
   // Update the welcome message to remove the "send message" button
   await client.chat.update({
     channel: metadata.cid,

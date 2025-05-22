@@ -3,7 +3,6 @@ import type {
   BlockAction,
   SlackActionMiddlewareArgs,
   SlackViewMiddlewareArgs,
-  ViewSubmitAction,
 } from '@slack/bolt';
 
 interface ReplyMetadata {
@@ -14,29 +13,73 @@ interface ReplyMetadata {
   message: string;
 }
 
-export async function openReplyView({
+// replyClicked - <@id> said: <message>
+// replyAgain - <@id> replied: <message>
+// return if body.message or <-.text is falsy
+
+export async function replyClicked({
   ack,
   body,
   client,
 }: SlackActionMiddlewareArgs<BlockAction> & AllMiddlewareArgs): Promise<void> {
   await ack();
 
-  if (!body.message || !body.message.text) return;
+  if (!body.message || !body.message.text) throw new Error('reply: body.message nonexistent');
 
-  let replyBlockquote: string = '';
+  await client.views.open({
+    trigger_id: body.trigger_id,
+    view: {
+      callback_id: 'replyViewSubmitted',
+      type: 'modal',
+      private_metadata: JSON.stringify({
+        ts: body.message?.ts,
+        cid: body.container.channel_id,
+        uid: body.message.text.match(/<@(\w+)>/)![1],
+        senderUid: body.user.id,
+        message: body.message.text.match(/said:\s*(.*)/)![1],
+      }),
+      title: {
+        type: 'plain_text',
+        text: 'top text',
+      },
+      submit: {
+        type: 'plain_text',
+        text: 'send',
+      },
+      close: {
+        type: 'plain_text',
+        text: 'cancel',
+      },
+      blocks: [
+        {
+          type: 'input',
+          block_id: 'reply',
+          label: {
+            type: 'plain_text',
+            text: 'reply:',
+          },
+          element: {
+            type: 'plain_text_input',
+            action_id: 'input',
+          },
+        },
+      ],
+    },
+  });
+}
 
-  if (body.actions[0]?.action_id == 'replyClicked') {
-    replyBlockquote = body.message.text.match(/said:\s*(.*)/)![1] ?? '';
-  } else if (body.actions[0]?.action_id == 'replyAgain') {
-    const initialReplyBlockquote = body.message.text.match(
-      /(?<=replied:\s)(.*?)(?=\sreply button$)/
-    );
-    if (initialReplyBlockquote) {
-      replyBlockquote = initialReplyBlockquote[0];
-    } else {
-      replyBlockquote = body.message.text.match(/(?<=replied: ).*/)![0];
-    }
-  }
+export async function replyAgain({
+  ack,
+  body,
+  client,
+}: SlackActionMiddlewareArgs<BlockAction> & AllMiddlewareArgs): Promise<void> {
+  await ack();
+
+  if (!body.message || !body.message.text) throw new Error('reply: body.message nonexistent');
+
+  let replyBlockquote: string = body.message.text.match(/(?<=replied: ).*/)![0];
+
+  if (replyBlockquote.includes('reply button')) replyBlockquote = replyBlockquote.replace('reply button', '');
 
   await client.views.open({
     trigger_id: body.trigger_id,

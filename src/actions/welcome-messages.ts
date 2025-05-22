@@ -8,7 +8,7 @@ export async function sendWelcomeMessage({
   respond,
 }: SlackActionMiddlewareArgs & AllMiddlewareArgs): Promise<void> {
   await ack();
-  if (!body.channel || !body.channel.id) return; // in case the action is triggered from a modal
+  if (!body.channel || !body.channel.id) return; // in case the action is triggered from a modal, somehow
 
   await respond({ delete_original: true });
 
