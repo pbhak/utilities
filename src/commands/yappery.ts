@@ -29,6 +29,12 @@ export async function joinPingGroup({
       user: command.user_id,
       text: transcript.usergroup.leave,
     });
+
+    await client.chat.postEphemeral({
+      channel: command.channel_id,
+      user: process.env.USER_ID,
+      text: `user <@${command.user_id}> has left the ping group :pensive:`,
+    });
   } else if (currentPingGroupMembers.users) {
     const newPingGroupMembers = [...currentPingGroupMembers.users, command.user_id];
 
@@ -41,6 +47,12 @@ export async function joinPingGroup({
       channel: command.user_id,
       user: command.user_id,
       text: transcript.usergroup.join,
+    });
+
+    await client.chat.postEphemeral({
+      channel: command.channel_id,
+      user: process.env.USER_ID,
+      text: `user <@${command.user_id}> has joined the ping group :yay:`,
     });
   }
 }
