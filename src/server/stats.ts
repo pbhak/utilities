@@ -2,6 +2,19 @@ import nominatim, { type NominatimClient } from 'nominatim-client';
 import { app, sendLog, transcript } from '..';
 import type { Request, Response } from 'express';
 
+interface NominatimAddress {
+  amenity: string;
+  road: string;
+  suburb: string;
+  city_district: string;
+  city: string;
+  county: string;
+  state: string;
+  postcode: string;
+  country: string;
+  country_code: string;
+}
+
 // Initialize eocoding API
 const geocoding: NominatimClient = nominatim.createClient({
   useragent: "pbhak's utilities",
@@ -16,10 +29,14 @@ function batteryEmoji(battery: number, charging: boolean) {
     : transcript.emojis.battery.normal;
 }
 
-function locationEmoji(country: string) {
-  return country == 'United States'
-    ? transcript.emojis.country.us
-    : transcript.emojis.country.other;
+function locationEmoji(data: NominatimAddress) {
+  if (data.country_code) {
+    return `:flag_${data.country_code}:`;
+  } else {
+    return data.country == 'United States'
+      ? transcript.emojis.country.us
+      : transcript.emojis.country.other;
+  }
 }
 
 async function formatStats(battery: number, charging: boolean, lat: number, lon: number) {
@@ -29,7 +46,7 @@ async function formatStats(battery: number, charging: boolean, lat: number, lon:
     .replace('{battery}', `${battery}% ${batteryEmoji(battery, charging)}`)
     .replace(
       '{location}',
-      `${locationInfo.city}, ${locationInfo.state}  ${locationEmoji(locationInfo.country)}`
+      `${locationInfo.city}, ${locationInfo.state ? locationInfo.state : locationInfo.country}  ${locationEmoji(locationInfo)}`
     );
 }
 
