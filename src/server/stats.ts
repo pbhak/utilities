@@ -31,7 +31,7 @@ function batteryEmoji(battery: number, charging: boolean) {
 
 function locationEmoji(data: NominatimAddress) {
   if (data.country_code) {
-    return `:flag_${data.country_code}:`;
+    return `:flag-${data.country_code}:`;
   } else {
     return data.country == 'United States'
       ? transcript.emojis.country.us
