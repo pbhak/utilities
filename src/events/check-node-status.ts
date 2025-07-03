@@ -30,7 +30,7 @@ function withinOneHour(date: Date): boolean {
 
 export async function checkNodeStatus() {
   let offlineNodes: TailscaleNodes[] = [];
-  const nodesToExclude = ['zenbook', 'hermando'];
+  const nodesToExclude = ['zenbook', 'hermando', 'george'];
 
   const tailscaleResponse = await fetch(
     'https://api.tailscale.com/api/v2/tailnet/pbhak.github/devices',
