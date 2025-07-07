@@ -3,9 +3,6 @@
 
 _a small bot I made for my channel (#parneel-yaps, you should join) in the Hack Club Slack_
 
-> [!NOTE]
-> As of early May, I've completely rewritten this application in TypeScript. It was a great learning experience and this new application structure makes it much more reliable.
-
 ## features!
 - Custom interactive welcome logic that allows the user to choose whether they would like to be welcomed publicly
   - If so, they have the option to send me a message through the application, with built in reply functionality
