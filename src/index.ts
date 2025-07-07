@@ -61,7 +61,7 @@ export async function sendLog(
   });
 }
 
-new CronJob('0 * * * *', checkNodeStatus, null, true, 'America/Los_Angeles');
+// new CronJob('0 * * * *', checkNodeStatus, null, true, 'America/Los_Angeles');
 
 ////// Event handlers
 app.event('member_joined_channel', memberJoin);
