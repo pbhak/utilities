@@ -15,6 +15,7 @@ stats: |
   *daily stats:*
   phone battery: {battery}
   location: {location}
+  time spent coding: {codingTime}
 
 startup:
   bot: started!

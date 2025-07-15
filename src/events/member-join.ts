@@ -23,7 +23,7 @@ export async function memberJoin({
   // Notify me :3
   await client.chat.postEphemeral({
     channel: event.channel,
-    text: `user <@${event.user}> has joined! :yay:`,
+    text: `<@${event.user}> has joined! :yay:`,
     user: process.env.USER_ID
   })
 

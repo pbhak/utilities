@@ -15,11 +15,37 @@ interface NominatimAddress {
   country_code: string;
 }
 
+interface HackatimeData {
+  data: {
+    grand_total: {
+      text: string;
+      total_seconds: number;
+    };
+  };
+}
+
 // Initialize eocoding API
 const geocoding: NominatimClient = nominatim.createClient({
   useragent: "pbhak's utilities",
   referer: 'https://utilities.pbhak.dev',
 });
+
+async function getHackatimeData(): Promise<string> {
+  const hackatimeEndpoint = `https://hackatime.hackclub.com/api/hackatime/v1/users/${process.env.USER_ID}/statusbar/today`;
+  const hackatimeData = (await fetch(hackatimeEndpoint).then(
+    async (result) => await result.json()
+  )) as HackatimeData;
+
+  const hackatimeSeconds = hackatimeData.data.grand_total.total_seconds;
+  if (hackatimeSeconds === 0) return '0m';
+  if (hackatimeSeconds < 60) return `${Math.round(hackatimeSeconds)}s`;
+
+  const hackatimeMinutes = hackatimeSeconds / 60;
+  if (hackatimeMinutes < 60) return `${Math.round(hackatimeMinutes)}m`;
+
+  const hackatimeHours = hackatimeMinutes / 60;
+  return `${Math.round(hackatimeHours)}h${Math.round(hackatimeHours % 60)}m`;
+}
 
 function batteryEmoji(battery: number, charging: boolean) {
   return charging
@@ -41,13 +67,17 @@ function locationEmoji(data: NominatimAddress) {
 
 async function formatStats(battery: number, charging: boolean, lat: number, lon: number) {
   const locationInfo = (await geocoding.reverse({ lat, lon })).address;
+  const hackatimeInfo = await getHackatimeData();
 
   return transcript.stats
     .replace('{battery}', `${battery}% ${batteryEmoji(battery, charging)}`)
     .replace(
       '{location}',
-      `${locationInfo.city}, ${locationInfo.state ? locationInfo.state : locationInfo.country}  ${locationEmoji(locationInfo)}`
-    );
+      `${locationInfo.city}, ${
+        locationInfo.state ? locationInfo.state : locationInfo.country
+      }  ${locationEmoji(locationInfo)}`
+    )
+    .replace('{codingTime}', hackatimeInfo);
 }
 
 export default async function info(req: Request, res: Response) {
