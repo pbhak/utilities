@@ -47,7 +47,7 @@ async function getHackatimeData(): Promise<string> {
   if (hackatimeMinutes < 60) return `${Math.round(hackatimeMinutes)}m`;
 
   const hackatimeHours = hackatimeMinutes / 60;
-  return `${Math.round(hackatimeHours)}h${Math.round(hackatimeHours % 60)}m`;
+  return `${Math.round(hackatimeHours)}h ${Math.round(hackatimeHours % 60)}m`;
 }
 
 function batteryEmoji(battery: number, charging: boolean) {
