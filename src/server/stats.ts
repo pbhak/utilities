@@ -32,9 +32,12 @@ const geocoding: NominatimClient = nominatim.createClient({
 
 async function getHackatimeData(): Promise<string> {
   const hackatimeEndpoint = `https://hackatime.hackclub.com/api/hackatime/v1/users/${process.env.USER_ID}/statusbar/today`;
-  const hackatimeData = (await fetch(hackatimeEndpoint).then(
-    async (result) => await result.json()
-  )) as HackatimeData;
+  const hackatimeData = (await fetch(hackatimeEndpoint, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${process.env.HACKATIME_API_KEY}`,
+    },
+  }).then(async (result) => await result.json())) as HackatimeData;
 
   const hackatimeSeconds = hackatimeData.data.grand_total.total_seconds;
   if (hackatimeSeconds === 0) return '0m';
