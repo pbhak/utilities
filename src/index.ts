@@ -33,8 +33,11 @@ process.on('uncaughtException', (error) => {
 });
 
 app.error(async (error) => {
-  sendLog(`An API error has occured (\`${error.name}\`):\n\`\`\`${error.stack}\`\`\``);
+  const stack = (error as any).original?.stack || error.stack;
+
+  await sendLog(`An API error has occurred (\`${error.name}\`):\n\`\`\`${stack}\`\`\``);
 });
+
 
 export const transcript: Transcript = parseYAML(await Bun.file('transcript.yml').text());
 
