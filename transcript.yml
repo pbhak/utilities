@@ -1,9 +1,9 @@
 welcome:
   initial: |
     hey! thanks for joining my channel :)
-    feel free to ping me if you need something, or if you just want to talk - if i'm not currently active i'll get back to you as soon i get online
+    feel free to ping me (or shoot a DM!) if you need something, or if you just want to talk - if i'm not currently active i'll try get back to you as soon i get online!
 
-    oh and also, join the channels in the neighbors tab! they're all cool people (feel free to add yourself asw)
+    oh and also, join the channels in the neighbors tab! they're all cool people :D
     have a good one!
   question: do you want to be publicly welcomed?
   public: welcome to my channel {user}!
