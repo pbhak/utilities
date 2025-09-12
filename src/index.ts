@@ -19,6 +19,7 @@ import { homeOpened } from './events/home-open';
 import { memberJoin } from './events/member-join';
 import startServer from './server';
 import type { Transcript } from './types/transcript';
+import { memberLeave } from './events/member-leave';
 
 export const app = new App({
   token: process.env.ACCESS_TOKEN,
@@ -37,7 +38,6 @@ app.error(async (error) => {
 
   await sendLog(`An API error has occurred (\`${error.name}\`):\n\`\`\`${stack}\`\`\``);
 });
-
 
 export const transcript: Transcript = parseYAML(await Bun.file('transcript.yml').text());
 
@@ -68,6 +68,7 @@ export async function sendLog(
 
 ////// Event handlers
 app.event('member_joined_channel', memberJoin);
+app.event('member_left_channel', memberLeave);
 app.event('app_mention', appMention);
 app.event('app_home_opened', homeOpened);
 
