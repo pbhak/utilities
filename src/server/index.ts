@@ -4,6 +4,7 @@ import { app, sendLog, transcript } from '..';
 import type { WalkWebhook } from '../types/walk';
 import info from './stats';
 import processWalk from './walk';
+import lastfm from './lastfm';
 
 const server = express();
 server.use(bodyParser.json());
@@ -18,6 +19,8 @@ server.get('/online', async (req, res) => {
 
   res.send(isOnline);
 });
+
+server.get('/lastfm', lastfm);
 
 server.post('/walk', (req, res) => {
   processWalk((req.body[0] as WalkWebhook)._links.workout[0]!.href);

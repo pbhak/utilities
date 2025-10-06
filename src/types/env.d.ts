@@ -29,6 +29,8 @@ declare global {
       TAILSCALE_API_KEY: string;
       /** Hackatime API key */
       HACKATIME_API_KEY: string;
+      /** LastFM API key */
+      LASTFM_API_KEY: string;
     }
   }
 }
