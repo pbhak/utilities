@@ -78,7 +78,7 @@ async function formatStats(battery: number, charging: boolean, lat: number, lon:
       '{location}',
       `${locationInfo.city}, ${
         locationInfo.state ? locationInfo.state : locationInfo.country
-      } ${locationEmoji(locationInfo)}`
+      }  ${locationEmoji(locationInfo)}`
     )
     .replace('{codingTime}', hackatimeInfo);
 }
