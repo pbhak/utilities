@@ -1,7 +1,7 @@
 # pbhak's utilities
 ![Hackatime Badge](https://hackatime-badge.hackclub.com/U07V1ND4H0Q/utilities)
 
-_a small bot I made for my channel (#parneel-yaps, you should join) in the Hack Club Slack_
+_a small bot I made for my channel (#parneels-pancakeria, you should join) in the Hack Club Slack_
 
 ## features!
 - Custom interactive welcome logic that allows the user to choose whether they would like to be welcomed publicly
