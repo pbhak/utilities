@@ -20,6 +20,17 @@ export async function openMessageView({
   context,
 }: SlackActionMiddlewareArgs<BlockAction> & AllMiddlewareArgs): Promise<void> {
   await ack();
+
+  const welcomedUserId = body.message?.text?.match(/<@([A-Z0-9]+)>/)![1];
+  if (welcomedUserId !== body.user.id) {
+    client.chat.postEphemeral({
+      channel: body.channel!.id,
+      user: body.user.id,
+      text: `sorry, but this button can only be clicked by <@${welcomedUserId}> :p`,
+    });
+    return;
+  }
+
   await client.views.open({
     trigger_id: body.trigger_id,
     view: {
