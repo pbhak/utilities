@@ -31,6 +31,8 @@ declare global {
       HACKATIME_API_KEY: string;
       /** LastFM API key */
       LASTFM_API_KEY: string;
+      /** Command prefix for Slack commands (optional) */
+      COMMAND_PREFIX?: string;
     }
   }
 }
