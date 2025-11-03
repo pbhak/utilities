@@ -1,6 +1,6 @@
 import type { AllMiddlewareArgs, SlackEventMiddlewareArgs } from '@slack/bolt';
 import type { MemberJoinedChannelEvent, WebClient } from '@slack/web-api';
-import { transcript } from '..';
+import { transcript, getBotCount, incrementBotCount, sendLog } from '..';
 
 export async function memberJoin({
   client,
@@ -10,6 +10,11 @@ export async function memberJoin({
 
   const userInfo = await client.users.info({ user: event.user });
   const isBot = userInfo.user?.is_bot;
+
+  if (event.channel === process.env.MAIN_CHANNEL && isBot) {
+    incrementBotCount();
+    sendLog("Bot joined: " + event.user);
+  }
 
   if (event.channel !== process.env.MAIN_CHANNEL || isBot) return;
 
@@ -28,15 +33,18 @@ export async function memberJoin({
   })
 
   // Check the amount of people in the channel, and send a celebratory message if it's a multiple of 10
-  const numMembers = (await client.conversations.info({
+  const channelInfo = await client.conversations.info({
     channel: event.channel,
     include_num_members: true,
-  })).channel?.num_members;
+  });
+  
+  const totalMembers = channelInfo.channel?.num_members;
+  const humanMembers = totalMembers ? totalMembers - getBotCount() : 0;
 
-  if (numMembers && numMembers % 10 == 0) {
+  if (humanMembers && humanMembers % 10 == 0) {
     await client.chat.postMessage({
       channel: event.channel,
-      text: `we just hit ${numMembers} members!`,
+      text: `we just hit ${humanMembers} members!`,
     });
   }
 

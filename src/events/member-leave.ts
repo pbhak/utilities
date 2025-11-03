@@ -1,4 +1,5 @@
 import type { AllMiddlewareArgs, SlackEventMiddlewareArgs } from '@slack/bolt';
+import { decrementBotCount } from '..';
 
 export async function memberLeave({
   client,
@@ -6,6 +7,10 @@ export async function memberLeave({
 }: SlackEventMiddlewareArgs<'member_left_channel'> & AllMiddlewareArgs): Promise<void> {
   const userInfo = await client.users.info({ user: event.user });
   const isBot = userInfo.user?.is_bot;
+
+  if (event.channel === process.env.MAIN_CHANNEL && isBot) {
+    decrementBotCount();
+  }
 
   if (event.channel !== process.env.MAIN_CHANNEL || isBot) return;
 
