@@ -12,6 +12,8 @@ welcome:
 error: An error has occurred - see console for more information
 
 stats: |
+  <@U07V1ND4H0Q> _update time!_
+
   *daily stats:*
   phone battery: {battery}
   location: {location}
