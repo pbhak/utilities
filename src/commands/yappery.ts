@@ -44,7 +44,7 @@ export async function joinPingGroup({
     });
 
     await client.chat.postEphemeral({
-      channel: command.user_id,
+      channel: command.channel_id,
       user: command.user_id,
       text: transcript.usergroup.join,
     });
