@@ -2,11 +2,53 @@ import nominatim, { type NominatimClient } from 'nominatim-client';
 import { app, sendLog, transcript } from '..';
 import type { Request, Response } from 'express';
 
+interface NominatimAddress {
+  amenity: string;
+  road: string;
+  suburb: string;
+  city_district: string;
+  city: string;
+  county: string;
+  state: string;
+  postcode: string;
+  country: string;
+  country_code: string;
+}
+
+interface HackatimeData {
+  data: {
+    grand_total: {
+      text: string;
+      total_seconds: number;
+    };
+  };
+}
+
 // Initialize eocoding API
 const geocoding: NominatimClient = nominatim.createClient({
   useragent: "pbhak's utilities",
   referer: 'https://utilities.pbhak.dev',
 });
+
+async function getHackatimeData(): Promise<string> {
+  const hackatimeEndpoint = `https://hackatime.hackclub.com/api/hackatime/v1/users/${process.env.USER_ID}/statusbar/today`;
+  const hackatimeData = (await fetch(hackatimeEndpoint, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${process.env.HACKATIME_API_KEY}`,
+    },
+  }).then(async (result) => await result.json())) as HackatimeData;
+
+  const hackatimeSeconds = hackatimeData.data.grand_total.total_seconds;
+  if (hackatimeSeconds === 0) return '0m';
+  if (hackatimeSeconds < 60) return `${Math.round(hackatimeSeconds)}s`;
+
+  const hackatimeMinutes = hackatimeSeconds / 60;
+  if (hackatimeMinutes < 60) return `${Math.round(hackatimeMinutes)}m`;
+
+  const hackatimeHours = hackatimeMinutes / 60;
+  return `${Math.round(hackatimeHours)}:${Math.round(hackatimeHours % 60).toString().padStart(2, '0')}h`;
+}
 
 function batteryEmoji(battery: number, charging: boolean) {
   return charging
@@ -16,21 +58,29 @@ function batteryEmoji(battery: number, charging: boolean) {
     : transcript.emojis.battery.normal;
 }
 
-function locationEmoji(country: string) {
-  return country == 'United States'
-    ? transcript.emojis.country.us
-    : transcript.emojis.country.other;
+function locationEmoji(data: NominatimAddress) {
+  if (data.country_code) {
+    return `:flag-${data.country_code}:`;
+  } else {
+    return data.country == 'United States'
+      ? transcript.emojis.country.us
+      : transcript.emojis.country.other;
+  }
 }
 
 async function formatStats(battery: number, charging: boolean, lat: number, lon: number) {
   const locationInfo = (await geocoding.reverse({ lat, lon })).address;
+  const hackatimeInfo = await getHackatimeData();
 
   return transcript.stats
     .replace('{battery}', `${battery}% ${batteryEmoji(battery, charging)}`)
     .replace(
       '{location}',
-      `${locationInfo.city}, ${locationInfo.state}  ${locationEmoji(locationInfo.country)}`
-    );
+      `${locationInfo.city}, ${
+        locationInfo.state ? locationInfo.state : locationInfo.country
+      }  ${locationEmoji(locationInfo)}`
+    )
+    .replace('{codingTime}', hackatimeInfo);
 }
 
 export default async function info(req: Request, res: Response) {

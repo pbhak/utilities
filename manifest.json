@@ -1,0 +1,84 @@
+{
+  "display_information": {
+    "name": "pbhak's utilities",
+    "description": "A Slack bot I made for my personal channel, #parneel-yaps!",
+    "background_color": "#2c2d30"
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": true,
+      "messages_tab_enabled": false,
+      "messages_tab_read_only_enabled": true
+    },
+    "bot_user": {
+      "display_name": "pbhak's utilities",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/sha256",
+        "description": "on demand sha256 hashing!",
+        "usage_hint": "[text to hash]",
+        "should_escape": false
+      },
+      {
+        "command": "/yappery",
+        "description": "joins (or leaves) my ping group!",
+        "should_escape": false
+      },
+      {
+        "command": "/get-id",
+        "description": "gets user/channel ids!",
+        "usage_hint": "[users/channels/user groups]",
+        "should_escape": true
+      },
+      {
+        "command": "/debug",
+        "description": "admin-only debug commands!",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "app_mentions:read",
+        "channels:history",
+        "channels:manage",
+        "channels:read",
+        "channels:write.invites",
+        "chat:write",
+        "chat:write.customize",
+        "chat:write.public",
+        "commands",
+        "groups:history",
+        "groups:read",
+        "groups:write",
+        "groups:write.invites",
+        "mpim:read",
+        "reactions:read",
+        "reactions:write",
+        "users:read",
+        "usergroups:write",
+        "usergroups:read"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "bot_events": [
+        "app_home_opened",
+        "app_mention",
+        "member_joined_channel",
+        "message.channels",
+        "message.groups"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": true,
+    "token_rotation_enabled": false
+  }
+}

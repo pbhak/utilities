@@ -5,8 +5,9 @@ export async function getId({
   command,
   client,
 }: SlackCommandMiddlewareArgs & AllMiddlewareArgs): Promise<void> {
+  // NOTE: this command needs to configured to escape inbound user and channel mentions on the Slack API homepage
   await ack();
-
+  
   let allIds: { name: string; id: string }[] = [];
   let message: string = "here's your requested IDs!\n";
 

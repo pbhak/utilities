@@ -8,7 +8,7 @@ import {
   openPrivateChannelView,
 } from './actions/private-channel';
 import { handleMessageSubmission, openMessageView } from './actions/send-message';
-import { handleReplySubmission, openReplyView } from './actions/send-reply';
+import { handleReplySubmission, replyAgain, replyClicked } from './actions/send-reply';
 import { dontSendWelcomeMessage, sendWelcomeMessage } from './actions/welcome-messages';
 import { getId } from './commands/get-id';
 import { sha256 } from './commands/sha256';
@@ -19,6 +19,7 @@ import { homeOpened } from './events/home-open';
 import { memberJoin } from './events/member-join';
 import startServer from './server';
 import type { Transcript } from './types/transcript';
+import { memberLeave } from './events/member-leave';
 
 export const app = new App({
   token: process.env.ACCESS_TOKEN,
@@ -33,7 +34,9 @@ process.on('uncaughtException', (error) => {
 });
 
 app.error(async (error) => {
-  sendLog(`An API error has occured (\`${error.name}\`):\n\`\`\`${error.stack}\`\`\``);
+  const stack = (error as any).original?.stack || error.stack;
+
+  await sendLog(`An API error has occurred (\`${error.name}\`):\n\`\`\`${stack}\`\`\``);
 });
 
 export const transcript: Transcript = parseYAML(await Bun.file('transcript.yml').text());
@@ -61,17 +64,18 @@ export async function sendLog(
   });
 }
 
-new CronJob('0 * * * *', checkNodeStatus, null, true, 'America/Los_Angeles');
+// new CronJob('0 * * * *', checkNodeStatus, null, true, 'America/Los_Angeles');
 
 ////// Event handlers
 app.event('member_joined_channel', memberJoin);
+app.event('member_left_channel', memberLeave);
 app.event('app_mention', appMention);
 app.event('app_home_opened', homeOpened);
 
 ////// Action handlers
 app.action('sendMessage', openMessageView);
-app.action('replyAgain', openReplyView);
-app.action('replyClicked', openReplyView);
+app.action('replyAgain', replyAgain);
+app.action('replyClicked', replyClicked);
 app.action('showWelcomeMessage', sendWelcomeMessage);
 app.action('dontShowWelcomeMessage', dontSendWelcomeMessage);
 app.action('privateChannelAdd', openPrivateChannelView);

@@ -27,6 +27,10 @@ declare global {
       MPF_BEARER_TOKEN: string;
       /** Tailscale API key */
       TAILSCALE_API_KEY: string;
+      /** Hackatime API key */
+      HACKATIME_API_KEY: string;
+      /** LastFM API key */
+      LASTFM_API_KEY: string;
     }
   }
 }
