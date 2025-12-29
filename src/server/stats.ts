@@ -1,18 +1,43 @@
-import nominatim, { type NominatimClient } from 'nominatim-client';
-import { app, sendLog, transcript } from '..';
 import type { Request, Response } from 'express';
+import { app, sendLog, transcript } from '..';
 
-interface NominatimAddress {
-  amenity: string;
-  road: string;
-  suburb: string;
-  city_district: string;
-  city: string;
-  county: string;
-  state: string;
-  postcode: string;
+interface IPData {
+  ip: string;
+  success: boolean;
+  type: string;
+  continent: string;
+  continent_code: string;
   country: string;
   country_code: string;
+  region: string;
+  region_code: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  is_eu: boolean;
+  postal: string;
+  calling_code: string;
+  capital: string;
+  borders: string;
+  flag: {
+    img: string;
+    emoji: string;
+    emoji_unicode: string;
+  };
+  connection: {
+    asn: number;
+    org: string;
+    isp: string;
+    domain: string;
+  };
+  timezone: {
+    id: string;
+    abbr: string;
+    is_dst: boolean;
+    offset: number;
+    utc: string;
+    current_time: Date;
+  };
 }
 
 interface HackatimeData {
@@ -23,12 +48,6 @@ interface HackatimeData {
     };
   };
 }
-
-// Initialize eocoding API
-const geocoding: NominatimClient = nominatim.createClient({
-  useragent: "pbhak's utilities",
-  referer: 'https://utilities.pbhak.dev',
-});
 
 async function getHackatimeData(): Promise<string> {
   const hackatimeEndpoint = `https://hackatime.hackclub.com/api/hackatime/v1/users/${process.env.USER_ID}/statusbar/today`;
@@ -47,10 +66,12 @@ async function getHackatimeData(): Promise<string> {
   if (hackatimeMinutes < 60) return `${Math.round(hackatimeMinutes)}m`;
 
   const hackatimeHours = hackatimeMinutes / 60;
-  return `${Math.round(hackatimeHours)}:${Math.round(hackatimeHours % 60).toString().padStart(2, '0')}h`;
+  return `${Math.round(hackatimeHours)}:${Math.round(hackatimeHours % 60)
+    .toString()
+    .padStart(2, '0')}h`;
 }
 
-function batteryEmoji(battery: number, charging: boolean) {
+function batteryEmoji(battery: number, charging: boolean): string {
   return charging
     ? ':zap:'
     : battery <= 20
@@ -58,28 +79,37 @@ function batteryEmoji(battery: number, charging: boolean) {
     : transcript.emojis.battery.normal;
 }
 
-function locationEmoji(data: NominatimAddress) {
-  if (data.country_code) {
-    return `:flag-${data.country_code}:`;
-  } else {
-    return data.country == 'United States'
-      ? transcript.emojis.country.us
-      : transcript.emojis.country.other;
+async function getCountry(ip: string): Promise<string> {
+  const ipData = (await fetch(`http://ipwho.is/${ip}`).then(
+    async (res) => await res.json()
+  )) as IPData;
+  return ipData.country;
+}
+
+async function locationEmoji(ip: string): Promise<string> {
+  try {
+    const ipData = (await fetch(`http://ipwho.is/${ip}`).then(
+      async (res) => await res.json()
+    )) as IPData;
+    return `:${ipData.flag.emoji}:`;
+  } catch {
+    return transcript.emojis.country.other;
   }
 }
 
-async function formatStats(battery: number, charging: boolean, lat: number, lon: number) {
-  const locationInfo = (await geocoding.reverse({ lat, lon })).address;
+async function formatStats(
+  battery: number,
+  charging: boolean,
+  city: string,
+  state: string,
+  ip: string
+) {
+  const country = await getCountry(ip);
   const hackatimeInfo = await getHackatimeData();
 
   return transcript.stats
     .replace('{battery}', `${battery}% ${batteryEmoji(battery, charging)}`)
-    .replace(
-      '{location}',
-      `${locationInfo.city}, ${
-        locationInfo.state ? locationInfo.state : locationInfo.country
-      }  ${locationEmoji(locationInfo)}`
-    )
+    .replace('{location}', `${city}, ${state ? state : country}  ${locationEmoji(ip)}`)
     .replace('{codingTime}', hackatimeInfo);
 }
 
@@ -109,9 +139,10 @@ export default async function info(req: Request, res: Response) {
     req.body.battery == undefined ||
     req.body.battery < 0 ||
     req.body.battery > 100 ||
-    req.body.lat == undefined ||
-    req.body.lon == undefined ||
-    req.body.charging == undefined
+    req.body.charging == undefined ||
+    req.body.city == undefined ||
+    req.body.state == undefined ||
+    req.body.ip == undefined
   ) {
     sendLog('invalid request made to /info - invalid request body', 'stats');
     res.sendStatus(400); // Either battery percentage was not given or percentage range is illegal
@@ -124,8 +155,9 @@ export default async function info(req: Request, res: Response) {
     text: await formatStats(
       req.body.battery,
       req.body.charging === 'Yes',
-      req.body.lat,
-      req.body.lon
+      req.body.city,
+      req.body.state,
+      req.body.ip
     ),
   });
   res.sendStatus(200);

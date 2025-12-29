@@ -27,7 +27,6 @@
     "cors": "^2.8.5",
     "cron": "^4.3.0",
     "express": "^5.1.0",
-    "nominatim-client": "^3.2.1",
     "typescript": "^5.8.3",
     "yaml": "^2.7.1"
   },

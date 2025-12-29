@@ -51,9 +51,7 @@ interface Battery {
 }
 
 interface Country {
-  /** Emoji used when the current location is within the US */
-  us: string;
-  /** Emoji used when the current location is not within the US */
+  /** Emoji used when flag data cannot be obtained */
   other: string;
 }
 
