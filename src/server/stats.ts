@@ -91,7 +91,7 @@ async function locationEmoji(ip: string): Promise<string> {
     const ipData = (await fetch(`http://ipwho.is/${ip}`).then(
       async (res) => await res.json()
     )) as IPData;
-    return `:${ipData.flag.emoji}:`;
+    return `${ipData.flag.emoji}`;
   } catch {
     return transcript.emojis.country.other;
   }
@@ -105,11 +105,12 @@ async function formatStats(
   ip: string
 ) {
   const country = await getCountry(ip);
+  const flag = await locationEmoji(ip);
   const hackatimeInfo = await getHackatimeData();
 
   return transcript.stats
     .replace('{battery}', `${battery}% ${batteryEmoji(battery, charging)}`)
-    .replace('{location}', `${city}, ${state ? state : country}  ${locationEmoji(ip)}`)
+    .replace('{location}', `${city}, ${state ? state : country}  ${flag}`)
     .replace('{codingTime}', hackatimeInfo);
 }
 
