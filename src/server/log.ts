@@ -23,7 +23,7 @@ export default async function log(req: Request, res: Response) {
     return;
   }
 
-  if (!Object.hasOwn(req.body, "log")) {
+  if (req.body === undefined || req.body.log === undefined) {
     sendLog('invalid request made to /log - no log text provided', 'log');
     res.sendStatus(400);
     return;
