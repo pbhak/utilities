@@ -5,6 +5,7 @@ import type { WalkWebhook } from '../types/walk';
 import info from './stats';
 import processWalk from './walk';
 import lastfm from './lastfm';
+import log from './log'
 
 const server = express();
 server.use(bodyParser.json());
@@ -28,6 +29,8 @@ server.post('/walk', (req, res) => {
 });
 
 server.post('/info', info);
+
+server.post('/log', log)
 
 export default function startServer() {
   server.listen(process.env.PORT, () => {
