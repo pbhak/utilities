@@ -30,4 +30,5 @@ export default async function log(req: Request, res: Response) {
   }
 
   sendLog(req.body.log, req.body.source ? req.body.source : 'log');
+  res.sendStatus(200);
 }
