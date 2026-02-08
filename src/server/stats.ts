@@ -65,8 +65,9 @@ async function getHackatimeData(): Promise<string> {
   const hackatimeMinutes = hackatimeSeconds / 60;
   if (hackatimeMinutes < 60) return `${Math.round(hackatimeMinutes)}m`;
 
-  const hackatimeHours = hackatimeMinutes / 60;
-  return `${Math.round(hackatimeHours)}:${Math.round(hackatimeHours % 60)
+  const hackatimeHours = Math.floor(hackatimeMinutes / 60);
+  const hackatimeRemainingMinutes = Math.floor(hackatimeMinutes % 60);
+  return `${hackatimeHours}:${hackatimeRemainingMinutes
     .toString()
     .padStart(2, '0')}h`;
 }
