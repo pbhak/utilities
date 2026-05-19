@@ -75,13 +75,8 @@ export async function initializeBotCount(): Promise<void> {
       totalMembers += channelInfo.members.length;
       cursor = channelInfo.response_metadata?.next_cursor;
 
-      await new Promise(resolve => setTimeout(resolve, 100));
-
+      await Bun.sleep(100);
     } while (cursor);
-
-    botCount = botCounter;
-    console.log(`Initialized bot count: ${botCount} bots out of ${totalMembers} total members`);
-    sendLog(`Bot count initialized: ${botCount} bots out of ${totalMembers} total members`, 'bot-counter');
   } catch (error) {
     console.error('Failed to initialize bot count:', error);
     sendLog(`Failed to initialize bot count: ${error}`, 'bot-counter');
@@ -161,13 +156,6 @@ app.command(getCommandName('get-id'), getId);
   await app.start();
   console.log(transcript.startup.bot);
   sendLog(transcript.startup.bot, 'bot');
-
-  const prefix = process.env.COMMAND_PREFIX;
-  if (prefix) {
-    const commandInfo = `Commands available with prefix "${prefix}": ${getCommandName('sha256')}, ${getCommandName('yappery')}, ${getCommandName('get-id')}`;
-    console.log(commandInfo);
-    sendLog(commandInfo, 'commands');
-  }
 
   // Initialize bot count after startup
   await initializeBotCount();
